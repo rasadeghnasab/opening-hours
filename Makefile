@@ -5,14 +5,14 @@ ifdef filter
 	TEST_FILTER = --filter $(filter)
 endif
 
-project: laravel-dep node-dep up test
+project: laravel-dep up test
 
 laravel-dep:
 	cp project/.env.example project/.env
 	$(COMPOSE) run --rm composer install
 
-node-dep:
-	$(COMPOSE) run --rm npm install
+artisan:
+	$(COMPOSE) run --rm artisan $(c)
 
 up:
 	$(COMPOSE) up -d $(c)
