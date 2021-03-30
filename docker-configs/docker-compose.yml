@@ -1,0 +1,66 @@
+version: '3'
+
+networks:
+  laravel:
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ../:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - laravel
+
+  php:
+    build:
+      args:
+        user: ramin
+        uid: 1000
+      context: .
+      dockerfile: Dockerfile
+    container_name: php
+    volumes:
+      - ../:/var/www/html
+    ports:
+      - "9000:9000"
+    networks:
+      - laravel
+
+  composer:
+    image: composer:latest
+    container_name: composer
+    volumes:
+      - ../:/var/www/html
+    working_dir: /var/www/html/project
+    depends_on:
+      - php
+    networks:
+      - laravel
+
+  artisan:
+    build:
+      args:
+        user: ramin
+        uid: 1000
+      context: .
+      dockerfile: Dockerfile
+    container_name: artisan
+    volumes:
+      - ../:/var/www/html
+    working_dir: /var/www/html/project
+    entrypoint: [ 'php', 'artisan' ]
+    networks:
+      - laravel
+
+  tests:
+    image: php:7.4-fpm
+    volumes:
+      - ../:/var/www/html
+    working_dir: /var/www/html/project
+    entrypoint: vendor/bin/phpunit
