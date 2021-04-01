@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Station;
 use App\Models\Store;
 use Illuminate\Database\Seeder;
 
@@ -16,8 +17,9 @@ class StationSeeder extends Seeder
     {
         $stores = Store::all();
 
+        Station::unguard();
         foreach ($stores as $store) {
-            Store::factory()->count(10)->create(
+            Station::factory()->count(10)->create(
                 [
                     'store_id' => $store->id,
                 ]
