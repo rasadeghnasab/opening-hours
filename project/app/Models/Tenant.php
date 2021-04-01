@@ -15,4 +15,9 @@ class Tenant extends Model
     {
         return $this->hasMany(Store::class);
     }
+
+    public function times()
+    {
+        return $this->morphMany(OpenHour::class, 'timeable');
+    }
 }

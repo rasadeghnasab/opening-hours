@@ -16,8 +16,6 @@ class CreateOpenHoursTable extends Migration
         Schema::create('open_hours', function (Blueprint $table) {
             $table->id();
             $table->morphs('timeable');
-            $table->time('from');
-            $table->time('to');
             $table->enum('day', [
                 'monday',
                 'tuesday',
@@ -27,6 +25,8 @@ class CreateOpenHoursTable extends Migration
                 'saturday',
                 'sunday',
             ]);
+            $table->time('from');
+            $table->time('to');
             $table->timestamps();
         });
     }

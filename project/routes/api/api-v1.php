@@ -8,6 +8,7 @@ Route::apiResources(
         'tenants' => TenantsController::class,
         'tenants.stores' => StoresController::class,
         'stores.stations' => StationsController::class
+//        'station'
     ]
 );
 
