@@ -25,6 +25,7 @@ class OpenHoursController extends Controller
      */
     public function store(Request $request)
     {
+        dd('hi');
         //
     }
 

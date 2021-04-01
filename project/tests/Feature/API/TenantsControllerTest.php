@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\API\V1;
+namespace Tests\Feature\API;
 
 use App\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;

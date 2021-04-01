@@ -24,12 +24,6 @@ class MorphServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Relation::morphMap(
-            [
-                'tenant' => 'App\Models\Tenant',
-                'store' => 'App\Models\Store',
-                'station' => 'App\Models\Station',
-            ]
-        );
+        Relation::morphMap(config('timeables'));
     }
 }

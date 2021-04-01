@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace App\Providers;
 
@@ -35,6 +36,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->constraints();
         $this->configureRateLimiting();
 
         $this->routes(
@@ -64,5 +66,11 @@ class RouteServiceProvider extends ServiceProvider
                 return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
             }
         );
+    }
+
+    protected function constraints()
+    {
+        $timeblaes = array_keys(config('timeables'));
+        Route::pattern('timeable', implode('|', $timeblaes));
     }
 }
