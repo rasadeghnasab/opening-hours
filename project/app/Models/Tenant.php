@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Tenant extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name'];
+
+    public function stores()
+    {
+        return $this->hasMany(Store::class);
+    }
 }
