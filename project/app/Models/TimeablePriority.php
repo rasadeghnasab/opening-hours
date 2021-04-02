@@ -10,6 +10,8 @@ class TimeablePriority extends Model
 {
     use HasFactory;
 
+    protected $table = 'timeables_priority';
+
     protected $fillable = ['name', 'priority'];
 
     /**
