@@ -47,7 +47,6 @@ class OpenHoursControllerTest extends TestCase
      */
     public function open_hour_input_values_must_be_valid(array $data, array $expected): void
     {
-
         foreach($this->timeables as $timeable_name => $timeable_class) {
             $timeable = $timeable_class::factory()->create();
             $response = $this->json(
