@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Tenant;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -83,7 +84,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function constraints()
     {
-        $timeblaes = array_keys(config('timeables'));
-        Route::pattern('timeable_type', implode('|', $timeblaes));
+        $timeables = array_keys(config('timeables'));
+        Route::pattern('timeable_type', implode('|', $timeables));
     }
 }
