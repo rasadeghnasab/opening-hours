@@ -14,5 +14,5 @@ Route::apiResources(
     ]
 );
 
-//Route::post('open_hours/{timeable}/{timeable_id}/', [OpenHoursController::class, 'store']);
+Route::post('open_hours/{timeable}/{timeable_id}/', [OpenHoursController::class, 'store']);
 
