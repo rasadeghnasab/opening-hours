@@ -17,6 +17,22 @@ services:
     networks:
       - laravel
 
+  mysql:
+    image: mysql:5.7
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: homestead
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: homestead
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - laravel
+
   php:
     build:
       args:
@@ -29,6 +45,8 @@ services:
       - ../:/var/www/html
     ports:
       - "9000:9000"
+    depends_on:
+      - mysql
     networks:
       - laravel
 
@@ -60,6 +78,7 @@ services:
 
   tests:
     image: php:7.4-fpm
+    container_name: tests
     volumes:
       - ../:/var/www/html
     working_dir: /var/www/html/project

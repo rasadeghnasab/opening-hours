@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace App\Providers;
 
@@ -35,6 +36,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->constraints();
         $this->configureRateLimiting();
 
         $this->routes(
@@ -49,6 +51,19 @@ class RouteServiceProvider extends ServiceProvider
                     ->group(base_path('routes/web.php'));
             }
         );
+
+        Route::bind('timeable', function ($timeable_id) {
+            $timeables = config('timeables');
+            $timeable_type = $this->app->request->route('timeable_type');
+
+            if(!isset($timeables[$timeable_type])) {
+                abort(405, 'not found');
+            }
+
+            $timeable_class = $timeables[$timeable_type];
+
+            return $timeable_class::findOrFail($timeable_id);
+        });
     }
 
     /**
@@ -64,5 +79,11 @@ class RouteServiceProvider extends ServiceProvider
                 return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
             }
         );
+    }
+
+    protected function constraints()
+    {
+        $timeblaes = array_keys(config('timeables'));
+        Route::pattern('timeable_type', implode('|', $timeblaes));
     }
 }

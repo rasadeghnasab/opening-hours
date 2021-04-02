@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOpeningHoursTable extends Migration
+class CreateOpenHoursTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,20 +13,12 @@ class CreateOpeningHoursTable extends Migration
      */
     public function up()
     {
-        Schema::create('opening_hours', function (Blueprint $table) {
+        Schema::create('open_hours', function (Blueprint $table) {
             $table->id();
             $table->morphs('timeable');
+            $table->tinyInteger('day');
             $table->time('from');
             $table->time('to');
-            $table->enum('day', [
-                'monday',
-                'tuesday',
-                'wednesday',
-                'thursday',
-                'friday',
-                'saturday',
-                'sunday',
-            ]);
             $table->timestamps();
         });
     }
@@ -38,6 +30,6 @@ class CreateOpeningHoursTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('opening_hours');
+        Schema::dropIfExists('open_hours');
     }
 }
