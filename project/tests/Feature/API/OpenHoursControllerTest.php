@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\API;
 
+use App\Models\Station;
+use App\Models\Store;
+use App\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -36,7 +39,7 @@ class OpenHoursControllerTest extends TestCase
      * @param array $data
      * @param array $expected
      */
-    public function open_hour_posted_values_must_be_valid(array $data, array $expected): void
+    public function open_hour_input_values_must_be_valid(array $data, array $expected): void
     {
         $valid_timeables = array_keys(config('timeables'));
 
@@ -51,6 +54,32 @@ class OpenHoursControllerTest extends TestCase
     }
 
     /**
+     * @test
+     *
+     */
+    public function should_returns_404_if_timeable_not_found(): void
+    {
+        $timeables = config('timeables');
+
+        foreach ($timeables as $timeable => $timeable_class) {
+            $$timeable = $timeable_class::factory()->create();
+
+            try {
+                $$timeable->delete();
+            } catch (\Exception $exception) {
+                $this->assertTrue(false, 'There is a problem with deleting models');
+            }
+            $response = $this->json(
+                'POST',
+                sprintf('%s/%s/%s', $this->uri, $timeable, $$timeable->id),
+                []
+            );
+
+            $response->assertStatus(404);
+        }
+    }
+
+    /**
      * Data provider for input validation
      *
      * @return \array[][]
@@ -59,12 +88,6 @@ class OpenHoursControllerTest extends TestCase
     {
         $valid_from = '09:00';
         $valid_to = '18:00';
-
-        $valid_data = [
-            "day" => 1,
-            "from" => $valid_from,
-            "to" => $valid_to,
-        ];
 
         return [
             [
