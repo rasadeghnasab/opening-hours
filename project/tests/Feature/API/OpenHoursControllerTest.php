@@ -2,9 +2,6 @@
 
 namespace Tests\Feature\API;
 
-use App\Models\Station;
-use App\Models\Store;
-use App\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,12 +11,21 @@ class OpenHoursControllerTest extends TestCase
 
     protected string $uri = '/api/v1/open_hours';
 
+    protected array $timeables;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->timeables = config('timeables');
+    }
+
     /**
      * @test
      */
     public function timeable_should_be_valid(): void
     {
-        $valid_timeables = array_keys(config('timeables'));
+        $valid_timeables = array_keys($this->timeables);
         $timeable_type = 'a_wrong_timeable';
         $timeable_id = 1;
 
@@ -34,14 +40,14 @@ class OpenHoursControllerTest extends TestCase
 
     /**
      * @test
-     * @dataProvider store_input_data
+     * @dataProvider store_input_data_provider
      *
      * @param array $data
      * @param array $expected
      */
     public function open_hour_input_values_must_be_valid(array $data, array $expected): void
     {
-        $valid_timeables = array_keys(config('timeables'));
+        $valid_timeables = array_keys($this->timeables);
 
         $response = $this->json(
             'POST',
@@ -55,11 +61,10 @@ class OpenHoursControllerTest extends TestCase
 
     /**
      * @test
-     *
      */
     public function should_returns_404_if_timeable_not_found(): void
     {
-        $timeables = config('timeables');
+        $timeables = $this->timeables;
 
         foreach ($timeables as $timeable => $timeable_class) {
             $$timeable = $timeable_class::factory()->create();
@@ -80,11 +85,44 @@ class OpenHoursControllerTest extends TestCase
     }
 
     /**
+     * @test
+     */
+    public function an_open_hour_should_submitted_successfully_using_valid_data(): void
+    {
+        $timeables = $this->timeables;
+
+        $data = [
+            'day' => 4,
+            'from' => '09:10',
+            'to' => '18:20',
+        ];
+
+        foreach ($timeables as $timeable => $timeable_class) {
+            $$timeable = $timeable_class::factory()->create();
+
+            $response = $this->json(
+                'POST',
+                sprintf('%s/%s/%s', $this->uri, $timeable, $$timeable->id),
+                $data
+            );
+
+            $response->assertStatus(200)
+                ->assertJson(
+                    [
+                        'data' => [
+                            'open_hour' => $data
+                        ]
+                    ]
+                );
+        }
+    }
+
+    /**
      * Data provider for input validation
      *
      * @return \array[][]
      */
-    public function store_input_data()
+    public function store_input_data_provider(): array
     {
         $valid_from = '09:00';
         $valid_to = '18:00';
