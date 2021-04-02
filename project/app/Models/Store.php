@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Interfaces\TimeableInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class Store extends Model
+class Store extends Model implements TimeableInterface
 {
     use HasFactory;
 
@@ -21,7 +23,7 @@ class Store extends Model
         return $this->belongsTo(Tenant::class);
     }
 
-    public function times()
+    public function times(): MorphMany
     {
         return $this->morphMany(OpenHour::class, 'timeable');
     }

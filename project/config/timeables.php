@@ -8,8 +8,8 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'tenant' => \App\Models\Tenant::class,
-    'store' => App\Models\Store::class,
-    'station' => App\Models\Station::class,
+    'tenants' => \App\Models\Tenant::class,
+    'stores' => App\Models\Store::class,
+    'stations' => App\Models\Station::class,
 
 ];

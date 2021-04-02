@@ -38,9 +38,11 @@ class OpenHoursControllerTest extends TestCase
      */
     public function open_hour_posted_values_must_be_valid(array $data, array $expected): void
     {
+        $valid_timeables = array_keys(config('timeables'));
+
         $response = $this->json(
             'POST',
-            sprintf('%s/%s/%s', $this->uri, 'store', 1),
+            sprintf('%s/%s/%s', $this->uri, $valid_timeables[array_rand($valid_timeables)], 1),
             $data
         );
 

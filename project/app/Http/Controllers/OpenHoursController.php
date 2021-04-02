@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OpenHours\OpenHourStoreRequest;
+use App\Interfaces\TimeableInterface;
 use App\Models\OpenHour;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class OpenHoursController extends Controller
@@ -21,11 +23,14 @@ class OpenHoursController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param OpenHourStoreRequest $request
+     * @param string $timeable_type
+     * @param TimeableInterface $timeable
      * @return \Illuminate\Http\Response
      */
-    public function store(OpenHourStoreRequest $request)
+    public function store(OpenHourStoreRequest $request, string $timeable_type, TimeableInterface $timeable)
     {
+        dd($timeable);
         return response(
             [
                 'hi' => 'ok'
