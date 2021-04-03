@@ -33,16 +33,19 @@ class OpenHourException extends Model
         $carbon_time = Carbon::createFromTimestamp($timestamp);
 
         $timeables_priority = TimeablePriority::all();
-        $priorities = implode(",", $timeables_priority->pluck('name')->reduce(
-            function ($carry, $priority) {
-                $carry[] = "timeable_type='${priority}' DESC";
-                return $carry;
-            },
-            []
-        ));
+        $priorities = implode(
+            ",",
+            $timeables_priority->pluck('name')->reduce(
+                function ($carry, $priority) {
+                    $carry[] = "timeable_type='${priority}' DESC";
+                    return $carry;
+                },
+                []
+            )
+        );
 
         /**
-     return     * Please note that this is here only for the review purposes.
+         * return     * Please note that this is here only for the review purposes.
          * ***** Sample query structure
          *
          * select * from "open_hours"
@@ -77,8 +80,12 @@ class OpenHourException extends Model
                 );
             }
         )
-            ->where('from', '<=', $carbon_time)
-            ->where('to', '>=', $carbon_time)
+            ->where(
+                function ($query) use ($carbon_time) {
+                    $query->where('from', '<=', $carbon_time)
+                        ->where('to', '>=', $carbon_time);
+                }
+            )
             ->orderByRaw(DB::raw("$priorities"));
     }
 }
