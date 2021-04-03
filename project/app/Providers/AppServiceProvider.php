@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Interfaces\HasOpenHoursInterface;
+use App\Interfaces\OpenHourInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,6 +15,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->bind(
+            OpenHourInterface::class,
+            function ($app, $params) {
+                $type = $params[0] ?? 'open';
+                $classes = config('open_hours_classes');
+
+                if (!$classes[$type] ?? null) {
+                    throw new \Exception('Open hour type is not valid');
+                }
+
+                return new $classes[$type];
+            }
+        );
         //
     }
 

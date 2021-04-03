@@ -45,7 +45,7 @@ class OpenHoursController extends Controller
     {
         $timestamp = $request->get('timestamp');
 
-        if($open_hour_exception = OpenHourException::exists($station, $timestamp)->first()) {
+        if($open_hour_exception = $station->exceptions($timestamp)->first()) {
             return response(['data' => (bool) $open_hour_exception->status]);
         }
 

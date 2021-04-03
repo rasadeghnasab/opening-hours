@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Interfaces\OpenHourInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OpenHour extends Model
+class OpenHour extends Model implements OpenHourInterface
 {
     use HasFactory;
 
