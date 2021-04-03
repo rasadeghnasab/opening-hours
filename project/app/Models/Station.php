@@ -41,6 +41,9 @@ class Station extends Model implements TimeableInterface
         $day = $carbon_time->dayOfWeek;
         $time = $carbon_time->format('H:i:s');
 
+        // preload store and tenant to make the query more faster
+        $this->load('store', 'store.tenant');
+
         /**
          * Please note that this is here only for the review purposes.
          * ***** Sample query structure
@@ -57,6 +60,9 @@ class Station extends Model implements TimeableInterface
          */
         return $this->times()->getRelated()->where(
             function ($query) {
+                // dynamically create the query
+                // ** NOTE: this gives us the power to add more entities in future without
+                // adding any other logic to our query **
                 $child = $this;
                 while ($child) {
                     $parent = $child->parent();
