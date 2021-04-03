@@ -44,8 +44,8 @@ class OpenHour extends Model
          *
          * select * from "open_hours"
          * where (
-         *  ("timeable_type" = 'stations' and "timeable_id" = '1')
-         *  or ("timeable_type" = 'stores' and "timeable_id" = '1')
+         *  ("timeable_type" = 'stations' and "timeable_id" = '300')
+         *  or ("timeable_type" = 'stores' and "timeable_id" = '10')
          *  or ("timeable_type" = 'tenants' and "timeable_id" = '1')
          * )
          * and "day" = '1'
