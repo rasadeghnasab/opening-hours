@@ -54,7 +54,7 @@ class OpenHour extends Model
          */
         return $query->where(
             function ($query) use ($station) {
-                $query->where(
+                $query->orWhere(
                     function ($inner_query) use ($station) {
                         $inner_query->where('timeable_type', 'stations')
                             ->where('timeable_id', $station->id);

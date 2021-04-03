@@ -29,7 +29,7 @@ class OpenHourException extends Model
      */
     public function scopeExists(Builder $query, Station $station, int $timestamp)
     {
-        // turn timestamp to day and time
+        // turn timestamp to carbon time
         $carbon_time = Carbon::createFromTimestamp($timestamp);
 
         $timeables_priority = TimeablePriority::all();
