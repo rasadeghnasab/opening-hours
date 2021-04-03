@@ -45,7 +45,7 @@ class OpenHourException extends Model
         );
 
         /**
-         * return     * Please note that this is here only for the review purposes.
+         * Please note that this is here only for the review purposes.
          * ***** Sample query structure
          *
          * select * from "open_hours"
