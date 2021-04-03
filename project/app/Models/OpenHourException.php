@@ -86,6 +86,6 @@ class OpenHourException extends Model
                         ->where('to', '>=', $carbon_time);
                 }
             )
-            ->orderByRaw(DB::raw("$priorities"));
+            ->orderByRaw(DB::raw($priorities));
     }
 }

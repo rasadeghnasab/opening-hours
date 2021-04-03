@@ -11,11 +11,7 @@ class OpenHour extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'day',
-        'from',
-        'to',
-    ];
+    protected $fillable = ['day', 'from', 'to'];
 
     /**
      * Retrieve any timeable entity
