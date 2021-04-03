@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Interfaces\HasOpenHoursInterface;
 use App\Interfaces\OpenHourInterface;
 use Illuminate\Support\ServiceProvider;
 

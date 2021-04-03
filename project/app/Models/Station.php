@@ -41,7 +41,6 @@ class Station extends Model implements TimeableInterface
     public function isOpen($timestamp): bool
     {
         $date_time = Carbon::createFromTimestamp($timestamp);
-
         $open_hour = App::make(OpenHourInterface::class);
 
         return $this->openHourMainQuery($open_hour, $date_time->format('H:i:s'))

@@ -6,7 +6,6 @@ use App\Http\Requests\OpenHours\CheckStationStatusRequest;
 use App\Http\Requests\OpenHours\OpenHourStoreRequest;
 use App\Interfaces\TimeableInterface;
 use App\Models\OpenHour;
-use App\Models\OpenHourException;
 use App\Models\Station;
 
 class OpenHoursController extends Controller
