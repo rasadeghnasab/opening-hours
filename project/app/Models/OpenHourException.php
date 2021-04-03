@@ -56,6 +56,7 @@ class OpenHourException extends Model
          * )
          * and "from" <= '2021-04-10 18:59:00'
          * and "to" >= '2021-04-10 18:59:00'
+         * order by timeable_type=stations DESC, timeable_type=store DESC, timeable_type=tenants DESC
          */
         return $query->where(
             function ($query) use ($station) {
