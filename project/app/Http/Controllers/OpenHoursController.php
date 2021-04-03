@@ -49,8 +49,6 @@ class OpenHoursController extends Controller
             return response(['data' => (bool) $open_hour_exception->status]);
         }
 
-        $is_open = OpenHour::isOpen($station, $timestamp)->exists();
-
-        return response(['data' => (bool) $is_open]);
+        return response(['data' => $station->isOpen($timestamp)]);
     }
 }

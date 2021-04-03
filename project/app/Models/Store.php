@@ -27,4 +27,9 @@ class Store extends Model implements TimeableInterface
     {
         return $this->morphMany(OpenHour::class, 'timeable');
     }
+
+    public function parent(): string
+    {
+        return 'tenant';
+    }
 }

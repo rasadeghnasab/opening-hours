@@ -22,4 +22,13 @@ class Tenant extends Model implements TimeableInterface
     {
         return $this->morphMany(OpenHour::class, 'timeable');
     }
+
+    /**
+     * It returns null since it has no parent
+     * @return string
+     */
+    public function parent(): string
+    {
+        return '';
+    }
 }
