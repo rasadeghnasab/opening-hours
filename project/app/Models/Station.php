@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
 
 class Station extends Model implements TimeableInterface
 {
@@ -73,20 +72,6 @@ class Station extends Model implements TimeableInterface
      */
     private function exceptions(): Builder
     {
-        /**
-         * Please note that this is here only for the review purposes.
-         * ***** Sample query structure
-         *
-         * select * from "open_hours"
-         * where (
-         *  ("timeable_type" = 'stations' and "timeable_id" = '300')
-         *  or ("timeable_type" = 'stores' and "timeable_id" = '10')
-         *  or ("timeable_type" = 'tenants' and "timeable_id" = '1')
-         * )
-         * and "from" <= '2021-04-10 18:59:00'
-         * and "to" >= '2021-04-10 18:59:00'
-         * order by timeable_type=stations DESC, timeable_type=store DESC, timeable_type=tenants DESC
-         */
         $open_hour_exception = App::make(OpenHourInterface::class, ['exception']);
 
         return $this->openHourMainQuery($open_hour_exception);
@@ -107,9 +92,6 @@ class Station extends Model implements TimeableInterface
          *  or ("timeable_type" = 'stores' and "timeable_id" = '10')
          *  or ("timeable_type" = 'tenants' and "timeable_id" = '1')
          * )
-         * and "day" = '1'
-         * and "from" <= '18:59:00'
-         * and "to" >= '18:59:00'
          */
         return $open_hour->where(
             function ($query) {
