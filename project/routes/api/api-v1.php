@@ -14,6 +14,7 @@ Route::apiResources(
     ]
 );
 
-Route::get('open_hours/stations/{station}', [OpenHoursController::class, 'check']);
 Route::post('open_hours/{timeable_type}/{timeable}', [OpenHoursController::class, 'store']);
+Route::get('open_hours/stations/{station}/state', [OpenHoursController::class, 'check']);
+Route::get('open_hours/stations/{station}/state/nextChange', [OpenHoursController::class, 'nextStateChange']);
 

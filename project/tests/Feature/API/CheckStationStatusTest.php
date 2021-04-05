@@ -31,7 +31,7 @@ class CheckStationStatusTest extends TestCase
         $station = Station::factory()->create();
         $response = $this->json(
             'GET',
-            sprintf('%s/%s?timestamp=%s', $this->uri, $station->id, $timestamp)
+            sprintf('%s/%s/state?timestamp=%s', $this->uri, $station->id, $timestamp)
         );
 
         $response->assertStatus($expected);
@@ -50,7 +50,7 @@ class CheckStationStatusTest extends TestCase
         $timestamp = time();
         $response = $this->json(
             'GET',
-            sprintf('%s/%s?timestamp=%s', $this->uri, $station->id, $timestamp)
+            sprintf('%s/%s/state?timestamp=%s', $this->uri, $station->id, $timestamp)
         );
 
         $this->assertIsBool($response->json('data'));
@@ -71,7 +71,7 @@ class CheckStationStatusTest extends TestCase
 
         $response = $this->json(
             'GET',
-            sprintf('%s/%s?timestamp=%s', $this->uri, $station->id, $timestamp)
+            sprintf('%s/%s/state?timestamp=%s', $this->uri, $station->id, $timestamp)
         );
 
         $response->assertStatus(200);

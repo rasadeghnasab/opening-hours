@@ -6,6 +6,7 @@ use App\Http\Requests\OpenHours\CheckStationStatusRequest;
 use App\Http\Requests\OpenHours\OpenHourStoreRequest;
 use App\Interfaces\TimeableInterface;
 use App\Models\OpenHour;
+use App\Models\OpenHourException;
 use App\Models\Station;
 
 class OpenHoursController extends Controller
@@ -43,5 +44,12 @@ class OpenHoursController extends Controller
     public function check(CheckStationStatusRequest $request, Station $station)
     {
         return response(['data' => $station->currentState($request->get('timestamp'))]);
+    }
+
+    public function nextStateChange(CheckStationStatusRequest $request, Station $station)
+    {
+        $current_state = $station->currentState($request->get('timestamp'));
+
+//        OpenHourException::
     }
 }
