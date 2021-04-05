@@ -14,6 +14,23 @@ class OpenHour extends Model implements OpenHourInterface
 
     protected $fillable = ['day', 'from', 'to'];
 
+    protected $dateFormat = [
+        'from' => 'H:i',
+        'to' => 'H:i'
+    ];
+
+    protected $appends = ['status'];
+
+    /**
+     * Open hours status is always 1
+     *
+     * @return int
+     */
+    public function getStatusAttribute(): int
+    {
+        return 1;
+    }
+
     /**
      * Retrieve any timeable entity
      *

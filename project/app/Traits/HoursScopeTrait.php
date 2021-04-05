@@ -32,7 +32,7 @@ trait HoursScopeTrait
      * @param Carbon $date_time
      * @return Builder
      */
-    public function scopeFromTime($query, Carbon $date_time): Builder
+    public function scopeInTime($query, Carbon $date_time): Builder
     {
         $time = $this->convertTime($date_time);
 
@@ -40,6 +40,20 @@ trait HoursScopeTrait
             function ($query) use ($time) {
                 $query->where('from', '<=', $time)
                     ->where('to', '>=', $time);
+            }
+        );
+    }
+
+    /**
+     * @param $query
+     * @param Carbon $date_time
+     * @return Builder
+     */
+    public function scopeIsAfter($query, Carbon $date_time): Builder
+    {
+        return $query->where(
+            function ($query) use ($date_time) {
+                $query->where('from', '>', $this->convertTime($date_time));
             }
         );
     }

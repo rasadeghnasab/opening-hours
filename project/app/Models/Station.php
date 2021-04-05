@@ -44,7 +44,7 @@ class Station extends Model implements TimeableInterface
 
         return $this->openHourMainQuery($open_hour)
             ->where('day', $date_time->dayOfWeek)
-            ->fromTime($date_time)
+            ->inTime($date_time)
             ->exists();
     }
 
@@ -58,7 +58,7 @@ class Station extends Model implements TimeableInterface
         $date_time = Carbon::createFromTimestamp($timestamp);
 
         $open_hour_exception = $this->exceptions()
-            ->fromTime($date_time)
+            ->inTime($date_time)
             ->orderByPriority()
             ->first();
 
@@ -70,11 +70,18 @@ class Station extends Model implements TimeableInterface
      *
      * @return Builder|Model|object|null
      */
-    private function exceptions(): Builder
+    public function exceptions(): Builder
     {
         $open_hour_exception = App::make(OpenHourInterface::class, ['exception']);
 
         return $this->openHourMainQuery($open_hour_exception);
+    }
+
+    public function openHours(): Builder
+    {
+        $open_hour = App::make(OpenHourInterface::class, ['open']);
+
+        return $this->openHourMainQuery($open_hour);
     }
 
     private function openHourMainQuery(OpenHourInterface $open_hour): Builder
