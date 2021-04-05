@@ -49,6 +49,18 @@ class Station extends Model implements TimeableInterface
     }
 
     /**
+     * Return the station current status
+     * @param int $timestamp
+     * @return bool
+     */
+    public function currentState(int $timestamp): bool
+    {
+        $open_hour_exception = $this->exceptions($timestamp)->first();
+
+        return $open_hour_exception->status ?? $this->isOpen($timestamp);
+    }
+
+    /**
      * Scope a query to only include popular users.
      *
      * @param int $timestamp

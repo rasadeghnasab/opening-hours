@@ -42,12 +42,6 @@ class OpenHoursController extends Controller
      */
     public function check(CheckStationStatusRequest $request, Station $station)
     {
-        $timestamp = $request->get('timestamp');
-
-        if($open_hour_exception = $station->exceptions($timestamp)->first()) {
-            return response(['data' => (bool) $open_hour_exception->status]);
-        }
-
-        return response(['data' => $station->isOpen($timestamp)]);
+        return response(['data' => $station->currentState($request->get('timestamp'))]);
     }
 }
