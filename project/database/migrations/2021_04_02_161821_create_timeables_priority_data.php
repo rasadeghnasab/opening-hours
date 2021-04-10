@@ -16,13 +16,13 @@ class CreateTimeablesPriorityData extends Migration
         DB::table('timeables_priority')->insert(
             [
                 [
-                    'name' => 'tenant',
+                    'name' => 'tenants',
                     'priority' => 1,
                     "created_at" =>  Carbon::now(),
                     "updated_at" => Carbon::now(),
                 ],
                 [
-                    'name' => 'store',
+                    'name' => 'stores',
                     'priority' => 2,
                     "created_at" =>  Carbon::now(),
                     "updated_at" => Carbon::now(),

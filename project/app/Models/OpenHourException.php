@@ -17,8 +17,24 @@ class OpenHourException extends Model implements OpenHourInterface
 
     protected $dates = [
         'from',
-        'to'
+        'to',
+        'updated_at',
+        'created_at',
     ];
+
+    protected $casts = [
+        'status' => 'int'
+    ];
+
+    /**
+     * Retrieve any timeable entity
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function timeable()
+    {
+        return $this->morphTo();
+    }
 
     public function scopeStatus($query, $status = 0): Builder
     {
@@ -29,4 +45,28 @@ class OpenHourException extends Model implements OpenHourInterface
     {
         return $date_time->toDateTimeString();
     }
+
+//    public function toArray()
+//    {
+//        return [
+//            'from' => $this->from->toTimeString(),
+//            'to' => $this->to->toTimeString(),
+//            'status' => $this->attributes['status'],
+//            'comment' => $this->attributes['comment'],
+//            'timeable_type' => $this->attributes['timeable_type'],
+//            'timeable_id' => $this->attributes['timeable_id'] ?? null,
+//        ];
+//    }
+
+//    public function getCreatedAtAttribute($date)
+//    {
+//        dd($date);
+//        dd(Carbon::createFromFormat('Y-m-d H:i:s', $date));
+//        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
+//    }
+//
+//    public function getUpdatedAtAttribute($date)
+//    {
+//        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
+//    }
 }

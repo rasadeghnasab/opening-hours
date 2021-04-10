@@ -20,6 +20,11 @@ class Station extends Model implements TimeableInterface
         return $this->morphMany(OpenHour::class, 'timeable');
     }
 
+    public function exceptionTimes(): MorphMany
+    {
+        return $this->morphMany(OpenHourException::class, 'timeable');
+    }
+
     public function store()
     {
         return $this->belongsTo(Store::class);
@@ -49,11 +54,11 @@ class Station extends Model implements TimeableInterface
     }
 
     /**
-     * Return the station current status
-     * @param int $timestamp
+     * Return the station state for a given timestamp
+     * @param int|null $timestamp
      * @return bool
      */
-    public function currentState(int $timestamp): bool
+    public function state(int $timestamp): bool
     {
         $date_time = Carbon::createFromTimestamp($timestamp);
 

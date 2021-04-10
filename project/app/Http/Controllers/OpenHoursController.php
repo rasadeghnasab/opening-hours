@@ -8,6 +8,7 @@ use App\Interfaces\TimeableInterface;
 use App\Models\OpenHour;
 use App\Models\Station;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class OpenHoursController extends Controller
 {
@@ -41,82 +42,87 @@ class OpenHoursController extends Controller
      * @param Station $station
      * @return string
      */
-    public function check(CheckStationStatusRequest $request, Station $station)
+    public function stateCheck(CheckStationStatusRequest $request, Station $station)
     {
-        return response(['data' => $station->currentState($request->get('timestamp'))]);
+        return response(['data' => $station->state($request->get('timestamp'))]);
     }
 
+    /**
+     * Check for the next time that station state changes,
+     * it should be timestamp or null
+     *
+     * @param CheckStationStatusRequest $request
+     * @param Station $station
+     * @return \Illuminate\Http\Response
+     */
     public function nextStateChange(CheckStationStatusRequest $request, Station $station)
     {
         $timestamp = $request->get('timestamp');
-        $current_state = $station->currentState($timestamp);
+        $current_state = $station->state($timestamp);
         $date_time = Carbon::createFromTimestamp($timestamp);
 
         $next_change = null;
-        $message = 'it will never change';
+        $message = sprintf('The station will be always %s', $current_state ? 'on' : 'off');
 
-        $changed_due_exception = $station
+        $exceptions = $station
             ->exceptions()
-            ->status(!$current_state)
-            ->isAfter($date_time)
-            ->first();
+            ->isAfter($date_time->clone()->setTime(00, 00))
+            ->get();
 
-        if ($changed_due_exception) {
-            $next_change = $changed_due_exception->from->timestamp;
-            $message = sprintf('The state will change on %s', $changed_due_exception->from->toDateTimeString());
-        }
+        $open_hours = $station->openHours()->orderBy('from')->get()->groupBy('day');
 
-        $open_hours = $station->openHours()->get()->groupBy('day');
+        $first_change_timestamp =
+            $exceptions->where('status', !$current_state)->where('from', '>=', $date_time->toDateTimeString())->first()->from
+            ?? $date_time->clone()->addWeek();
 
-        $week_days_numbers = weekDaysNumberStartFrom($date_time->dayOfWeek);
-        $week_days_names = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-
-        for ($i = 0; $i <= count($week_days_numbers); $i++) {
-            $week_day_index = $i < count($week_days_numbers) ? $i : 0;
-            $day_open_hours = $open_hours[$week_days_numbers[$week_day_index]] ?? collect();
-
-            /**** Have to be changed ****/
-
-            $start_time = '00:00';
-            $end_time = '24:00';
-            $day_name = sprintf('next %s', $week_days_names[$week_days_numbers[$week_day_index]]);
-
-            if ($week_day_index === 0 and $i < 7) {
-                $start_time = $date_time->format('H:i');
-                $end_time = '24:00';
-                $day_name = 'today';
-            } else {
-                if ($i === 7) {
-                    $end_time = $date_time->format('H:i');
-                }
+        $period = CarbonPeriod::create($date_time, $first_change_timestamp);
+        $result = null;
+        $diff = $period->count();
+        foreach ($period as $index => $date) {
+            if($index > 0) {
+                $date_time->setTime(00, 00);
             }
+            $day_plan = dayPlan($open_hours[$date->dayOfWeek] ?? collect());
+            $exceptionsBetween = $exceptions->filter(
+                function ($exception) use ($date, $index, $diff) {
+                    $start = $date->clone()->setTime(00, 00);
+                    $end = $date->clone()->setTime(24, 00);
 
-            $changed_due_open_hour = dayPlan($day_open_hours, $start_time, $end_time)->filter(
-                function ($plan) use ($current_state, $date_time, $i) {
-                    return $plan['status'] != $current_state && ($plan['from'] > $date_time->format('H:i') || $i > 1);
+                    if($index === $diff) {
+                        // last date should end before the start time
+                        $end->setTime($date->hour, $date->minute);
+                    }
+
+                    return $exception->from->gte($start) && $exception->from->lt($end);
                 }
-            )->first();
-
-            if ($changed_due_open_hour) {
-                $first_change_timestamp = strtotime(
-                    sprintf('%s %s', $day_name, $changed_due_open_hour['from']),
-                    $date_time->timestamp
+            );
+            $full_day_plan = $day_plan;
+            if ($exceptionsBetween->count()) {
+                $full_day_plan = applyExceptions(
+                    $day_plan,
+                    $exceptionsBetween
                 );
             }
 
-            if (
-                (!$changed_due_exception && $changed_due_open_hour && $first_change_timestamp > $date_time->timestamp)
-                || ($changed_due_open_hour && $changed_due_exception && $first_change_timestamp < $changed_due_exception->from->timestamp)
-            ) {
-                $next_change = strtotime(sprintf('%s %s', $day_name, $changed_due_open_hour['from']));
-                $message = sprintf('The state will change on %s', date('Y-m-d H:i:s', $next_change));
+            $changed = $full_day_plan->filter(
+                function ($plan) use ($current_state, $date_time) {
+                    return $plan['status'] != $current_state && $plan['from'] >= $date_time->toTimeString();
+                }
+            )->first();
+
+            if ($changed) {
+                $changed = $date->setTime(...explode(':', $changed['from']));
+                $result = $changed->timestamp;
+                $message = sprintf('The station state will change to %s on %s',
+                                   !$current_state ? 'on' : 'off', $changed->toDateString());
+
                 break;
             }
         }
 
         return response(
             [
-                'data' => $next_change,
+                'data' => $result,
                 'message' => $message,
             ]
         );

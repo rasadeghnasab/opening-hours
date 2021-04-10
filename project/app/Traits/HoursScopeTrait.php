@@ -51,10 +51,6 @@ trait HoursScopeTrait
      */
     public function scopeIsAfter($query, Carbon $date_time): Builder
     {
-        return $query->where(
-            function ($query) use ($date_time) {
-                $query->where('from', '>', $this->convertTime($date_time));
-            }
-        );
+        return $query->where('from', '>=', $this->convertTime($date_time));
     }
 }

@@ -23,6 +23,11 @@ class Tenant extends Model implements TimeableInterface
         return $this->morphMany(OpenHour::class, 'timeable');
     }
 
+    public function exceptionTimes(): MorphMany
+    {
+        return $this->morphMany(OpenHourException::class, 'timeable');
+    }
+
     /**
      * It returns null since it has no parent
      * @return string

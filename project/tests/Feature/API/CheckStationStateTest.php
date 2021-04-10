@@ -10,7 +10,7 @@ use App\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class CheckStationStatusTest extends TestCase
+class CheckStationStateTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -58,8 +58,12 @@ class CheckStationStatusTest extends TestCase
 
     /**
      * @test
-     *
      * @dataProvider station_status_data_provider
+     *
+     * @param $timeable_type
+     * @param $timestamp
+     * @param $status
+     * @param $message
      */
     public function should_return_correct_result_based_on_station_status(
         $timeable_type,

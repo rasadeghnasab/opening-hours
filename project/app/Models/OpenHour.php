@@ -12,12 +12,12 @@ class OpenHour extends Model implements OpenHourInterface
 {
     use HasFactory, HoursScopeTrait;
 
-    protected $fillable = ['day', 'from', 'to'];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+    }
 
-    protected $dateFormat = [
-        'from' => 'H:i',
-        'to' => 'H:i'
-    ];
+    protected $fillable = ['day', 'from', 'to'];
 
     protected $appends = ['status'];
 

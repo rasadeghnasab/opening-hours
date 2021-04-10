@@ -19,7 +19,7 @@ class CreateOpenHourExceptionsTable extends Migration
             $table->datetime('from');
             $table->datetime('to');
             $table->boolean('status');
-            $table->string('comment');
+            $table->string('comment')->nullable();
             $table->timestamps();
         });
     }
