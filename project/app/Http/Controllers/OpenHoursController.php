@@ -87,7 +87,7 @@ class OpenHoursController extends Controller
                 $date_time->setTime(00, 00);
             }
             $day_plan = dayPlan($open_hours[$date->dayOfWeek] ?? collect());
-            $exceptionsBetween = $exceptions->filter(
+            $day_exceptions = $exceptions->filter(
                 function ($exception) use ($date, $index, $diff) {
                     $start = $date->clone()->setTime(00, 00);
                     $end = $date->clone()->setTime(24, 00);
@@ -102,10 +102,10 @@ class OpenHoursController extends Controller
                 }
             );
             $full_day_plan = $day_plan;
-            if ($exceptionsBetween->count()) {
+            if ($day_exceptions->count()) {
                 $full_day_plan = applyExceptions(
                     $day_plan,
-                    $exceptionsBetween,
+                    $day_exceptions,
                     $date
                 );
             }
