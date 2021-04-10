@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\TimeablePriority;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 if (!function_exists('weekDaysNumberStartFrom')) {
@@ -58,7 +59,7 @@ if (!function_exists('dayPlan')) {
                 );
             }
 
-            if($time_range['from'] >= $next_start) {
+            if ($time_range['from'] >= $next_start) {
                 $output->push($time_range->only('from', 'to', 'day', 'status'));
                 $next_start = $time_range['to'];
             }
@@ -75,7 +76,7 @@ if (!function_exists('dayPlan')) {
             );
         }
 
-        if($output->isEmpty() && !$day_times->isEmpty()) {
+        if ($output->isEmpty() && !$day_times->isEmpty()) {
             $output = $output->merge($day_times);
         }
 
@@ -84,8 +85,10 @@ if (!function_exists('dayPlan')) {
 }
 
 if (!function_exists('applyExceptions')) {
-    function applyExceptions(Collection $plan, Collection $exceptions): Collection
+    function applyExceptions(Collection $plan, Collection $exceptions, Carbon $date = null): Collection
     {
+        $date = $date ?? Carbon::now();
+
         $timeables_priority = TimeablePriority::orderBy('priority')->get();
         $exceptions = $exceptions->groupBy('timeable_type');
 
@@ -94,7 +97,7 @@ if (!function_exists('applyExceptions')) {
                 continue;
             }
 
-            $plan = overwriteTimes($plan, $exceptions[$timeable->name]);
+            $plan = overwriteTimes($plan, $exceptions[$timeable->name], $date);
         }
 
         return $plan;
@@ -102,7 +105,7 @@ if (!function_exists('applyExceptions')) {
 }
 
 if (!function_exists('overwriteTimes')) {
-    function overwriteTimes(Collection $plan, Collection $exceptions): Collection
+    function overwriteTimes(Collection $plan, Collection $exceptions, Carbon $date): Collection
     {
         $output = collect();
         $exceptions = $exceptions->sortBy('from');
@@ -110,8 +113,10 @@ if (!function_exists('overwriteTimes')) {
 
         $start = '00:00';
         foreach ($exceptions as $index => $exception) {
-            $exception_from = $exception->from->toTimeString();
-            $exception_to = $exception->to->toTimeString();
+            $exception_from = $exception->from->toDateString() < $date->toDateString(
+            ) ? "00:00" : $exception->from->toTimeString();
+            $exception_to = $exception->to->toDateString() > $date->toDateString(
+            ) ? '24:00' : $exception->to->toTimeString();
 
             foreach ($plan as $time_range) {
                 // exception and time_range have intersect
@@ -181,15 +186,24 @@ if (!function_exists('overwriteTimes')) {
 
         return $output->merge(
             $exceptions->map(
-                function ($exception) {
+                function ($exception) use ($date) {
+                    $exception_from = $exception->from->toDateString() < $date->toDateString()
+                        ? "00:00" : $exception->from->toTimeString();
+                    $exception_to = $exception->to->toDateString() > $date->toDateString() ?
+                        '24:00' : $exception->to->toTimeString();
+
                     return [
-                        'from' => $exception->from->toTimeString(),
-                        'to' => $exception->to->toTimeString(),
+                        'from' => $exception_from,
+                        'to' => $exception_to,
                         'status' => $exception->status,
                         'day' => $exception->from->dayOfWeek
                     ];
                 }
             )
+        )->filter(
+            function ($time_range) {
+                return $time_range['from'] !== $time_range['to'];
+            }
         )->sortBy('from')->values();
     }
 }

@@ -69,17 +69,22 @@ class OpenHoursController extends Controller
             ->isAfter($date_time->clone()->setTime(00, 00))
             ->get();
 
+
         $open_hours = $station->openHours()->orderBy('from')->get()->groupBy('day');
 
         $first_change_timestamp =
-            $exceptions->where('status', !$current_state)->where('from', '>=', $date_time->toDateTimeString())->first()->from
+            $exceptions
+                ->where('status', !$current_state)
+                ->where('from', '>=', $date_time->toDateTimeString())
+                ->first()->from
             ?? $date_time->clone()->addWeek();
 
         $period = CarbonPeriod::create($date_time, $first_change_timestamp);
         $result = null;
         $diff = $period->count();
+
         foreach ($period as $index => $date) {
-            if($index > 0) {
+            if ($index > 0) {
                 $date_time->setTime(00, 00);
             }
             $day_plan = dayPlan($open_hours[$date->dayOfWeek] ?? collect());
@@ -88,19 +93,21 @@ class OpenHoursController extends Controller
                     $start = $date->clone()->setTime(00, 00);
                     $end = $date->clone()->setTime(24, 00);
 
-                    if($index === $diff) {
+                    if ($index === $diff) {
                         // last date should end before the start time
                         $end->setTime($date->hour, $date->minute);
                     }
 
-                    return $exception->from->gte($start) && $exception->from->lt($end);
+                    return ($exception->from->gte($start) && $exception->from->lt($end))
+                        || ($exception->from->lte($date) || $exception->to->gte($date));
                 }
             );
             $full_day_plan = $day_plan;
             if ($exceptionsBetween->count()) {
                 $full_day_plan = applyExceptions(
                     $day_plan,
-                    $exceptionsBetween
+                    $exceptionsBetween,
+                    $date
                 );
             }
 
@@ -113,8 +120,11 @@ class OpenHoursController extends Controller
             if ($changed) {
                 $changed = $date->setTime(...explode(':', $changed['from']));
                 $result = $changed->timestamp;
-                $message = sprintf('The station state will change to %s on %s',
-                                   !$current_state ? 'on' : 'off', $changed->toDateString());
+                $message = sprintf(
+                    'The station state will change to %s on %s',
+                    !$current_state ? 'on' : 'off',
+                    $changed->toDateTimeString()
+                );
 
                 break;
             }
@@ -124,6 +134,7 @@ class OpenHoursController extends Controller
             [
                 'data' => $result,
                 'message' => $message,
+                'date_time' => $date_time->toDateTimeString()
             ]
         );
     }

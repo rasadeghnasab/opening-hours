@@ -389,6 +389,34 @@ class StationNextStateChangeTest extends TestCase
             ]
         ];
 
+        $data[] = [
+            'preparation' => [
+                'station' => [
+                    'open_hours' => [
+                        [
+                            'day' => date('w'),
+                            'from' => '08:00',
+                            'to' => '18:00',
+                        ],
+                    ],
+                    'exceptions' => [
+                        [
+                            'from' => strtotime('today 16:00'),
+                            'to' => strtotime('+2 days 19:00'),
+                            'status' => 1,
+                            'comment' => 'simple_comment',
+                        ],
+                    ]
+                ],
+            ],
+            'tests' => [
+                ['timestamp' => strtotime('today 4:00'), 'expected' => 'today 08:00'],
+                ['timestamp' => strtotime('today 10:00'), 'expected' => '+2 days 19:00'],
+                ['timestamp' => strtotime('+1 day 16:30'), 'expected' => '+2 days 19:00'],
+                ['timestamp' => strtotime('+3 days 19:00'), 'expected' => '+1 week 08:00'],
+            ]
+        ];
+
         return $data;
     }
 
