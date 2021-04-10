@@ -57,76 +57,76 @@ class HelperTest extends TestCase
     public function applyExceptionsDataProvider(): array
     {
         return [
-//            [
-//                'plan' => collect(
-//                    [
-//                        collect(
-//                            [
-//                                'from' => '08:00',
-//                                'to' => '18:00',
-//                                'status' => 1,
-//                            ]
-//                        )
-//                    ]
-//                ),
-//                'exceptions' => collect(
-//                    [
-//                        [
-//                            'from' => Carbon::now()->setTime(6, 00),
-//                            'to' => Carbon::now()->setTime(9, 00),
-//                            'status' => 0,
-//                            'comment' => 'simple_comment',
-//                            'timeable_type' => 'stations'
-//                        ],
-//                        [
-//                            'from' => Carbon::now()->setTime(14, 00),
-//                            'to' => Carbon::now()->setTime(15, 00),
-//                            'status' => 0,
-//                            'comment' => 'simple_comment',
-//                            'timeable_type' => 'stations'
-//                        ],
-//                    ]
-//                ),
-//                'date' => Carbon::now()->setTime(00, 00),
-//                'expected' => [
-//                    [
-//                        "from" => "00:00",
-//                        "to" => "06:00:00",
-//                        "status" => 0,
-//                        'day' => null,
-//                    ],
-//                    [
-//                        "from" => "06:00:00",
-//                        "to" => "09:00:00",
-//                        "status" => 0,
-//                        'day' => 6,
-//                    ],
-//                    [
-//                        "from" => "09:00:00",
-//                        "to" => "14:00:00",
-//                        "status" => 1,
-//                        'day' => null,
-//                    ],
-//                    [
-//                        "from" => "14:00:00",
-//                        "to" => "15:00:00",
-//                        "status" => 0,
-//                        'day' => 6
-//                    ],
-//                    [
-//                        "from" => "15:00:00",
-//                        "to" => "18:00",
-//                        "status" => 1,
-//                        'day' => null,
-//                    ],
-//                    [
-//                        "from" => "18:00",
-//                        "to" => "24:00",
-//                        "status" => 0,
-//                        "day" => null,
-//                    ],
-//                ],
-//            ],
+            [
+                'plan' => collect(
+                    [
+                        collect(
+                            [
+                                'from' => '08:00',
+                                'to' => '18:00',
+                                'status' => 1,
+                            ]
+                        )
+                    ]
+                ),
+                'exceptions' => collect(
+                    [
+                        [
+                            'from' => Carbon::now()->setTime(6, 00),
+                            'to' => Carbon::now()->setTime(9, 00),
+                            'status' => 0,
+                            'comment' => 'simple_comment',
+                            'timeable_type' => 'stations'
+                        ],
+                        [
+                            'from' => Carbon::now()->setTime(14, 00),
+                            'to' => Carbon::now()->setTime(15, 00),
+                            'status' => 0,
+                            'comment' => 'simple_comment',
+                            'timeable_type' => 'stations'
+                        ],
+                    ]
+                ),
+                'date' => Carbon::now()->setTime(00, 00),
+                'expected' => [
+                    [
+                        "from" => "00:00",
+                        "to" => "06:00:00",
+                        "status" => 0,
+                        'day' => null,
+                    ],
+                    [
+                        "from" => "06:00:00",
+                        "to" => "09:00:00",
+                        "status" => 0,
+                        'day' => 6,
+                    ],
+                    [
+                        "from" => "09:00:00",
+                        "to" => "14:00:00",
+                        "status" => 1,
+                        'day' => null,
+                    ],
+                    [
+                        "from" => "14:00:00",
+                        "to" => "15:00:00",
+                        "status" => 0,
+                        'day' => 6
+                    ],
+                    [
+                        "from" => "15:00:00",
+                        "to" => "18:00",
+                        "status" => 1,
+                        'day' => null,
+                    ],
+                    [
+                        "from" => "18:00",
+                        "to" => "24:00",
+                        "status" => 0,
+                        "day" => null,
+                    ],
+                ],
+            ],
 
             [
                 'plan' => collect(
