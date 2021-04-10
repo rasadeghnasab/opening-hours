@@ -78,13 +78,6 @@ class StationNextStateChangeTest extends TestCase
                 'GET',
                 sprintf('%s?timestamp=%s', sprintf($this->uri, $station->id), $test['timestamp']),
             );
-//            $content = $response->dump()->content();
-//            dump($content);
-//            dd($response->dump());
-//            dump('result', strtotime($response->json('next')), $response->json('data'), $response->json('next'));
-//            dump('expected', $test['expected'], strtotime($test['expected']));
-//            dump('-------------');
-
 
             $response->assertStatus(200);
             $this->assertEquals(strtotime($test['expected']), $response->json('data'));

@@ -58,12 +58,10 @@ if (!function_exists('dayPlan')) {
                 );
             }
 
-//            dd($time_range, $next_start, $time_range['from'] >= $next_start);
             if($time_range['from'] >= $next_start) {
                 $output->push($time_range->only('from', 'to', 'day', 'status'));
                 $next_start = $time_range['to'];
             }
-//            dd($output);
         }
         $max = $day_times->max('to');
         if ($max < $end_time) {
@@ -118,8 +116,6 @@ if (!function_exists('overwriteTimes')) {
             foreach ($plan as $time_range) {
                 // exception and time_range have intersect
                 $has_intersect = ($time_range['from'] < $exception_to) && ($time_range['to'] > $exception_from);
-//                dump($time_range['from'], $time_range['to'], $has_intersect);
-//                dump('------------------');
 
                 if (!$has_intersect) {
                     if ($start <= $time_range['from']) {

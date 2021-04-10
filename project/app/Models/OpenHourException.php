@@ -45,28 +45,4 @@ class OpenHourException extends Model implements OpenHourInterface
     {
         return $date_time->toDateTimeString();
     }
-
-//    public function toArray()
-//    {
-//        return [
-//            'from' => $this->from->toTimeString(),
-//            'to' => $this->to->toTimeString(),
-//            'status' => $this->attributes['status'],
-//            'comment' => $this->attributes['comment'],
-//            'timeable_type' => $this->attributes['timeable_type'],
-//            'timeable_id' => $this->attributes['timeable_id'] ?? null,
-//        ];
-//    }
-
-//    public function getCreatedAtAttribute($date)
-//    {
-//        dd($date);
-//        dd(Carbon::createFromFormat('Y-m-d H:i:s', $date));
-//        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
-//    }
-//
-//    public function getUpdatedAtAttribute($date)
-//    {
-//        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
-//    }
 }
