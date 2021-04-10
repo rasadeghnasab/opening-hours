@@ -7,6 +7,7 @@ use App\Http\Requests\OpenHours\OpenHourStoreRequest;
 use App\Interfaces\TimeableInterface;
 use App\Models\OpenHour;
 use App\Models\Station;
+use App\Models\Timeline;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
@@ -78,6 +79,56 @@ class OpenHoursController extends Controller
                 ->first()->from
             ?? $date_time->clone()->addWeek();
 
+        $timeline = (new Timeline($open_hours))
+            ->generate($date_time, $first_change_timestamp)
+            ->applyExceptions($exceptions)
+//            ->toDateTime();
+            ->timeline();
+//        dump('timestamp');
+//        dd($timeline);
+
+//        while (count($timeline) > 0) {
+        $next_state_timestamp = null;
+        $message = sprintf('The station will be always %s', $current_state ? 'on' : 'off');
+
+//        dd($timeline);
+        foreach ($timeline as $state) {
+            if ($current_state && $date_time->timestamp > $state['from'] && $date_time->getTimestamp() < $state['to']) {
+                $next_state_timestamp = $state['to'];
+                break;
+            }
+            if (!$current_state && $date_time->timestamp < $state['from']) {
+                $next_state_timestamp = $state['to'];
+                break;
+            }
+        }
+
+        if ($next_state_timestamp) {
+            $message = sprintf(
+                'The station state will change to %s on %s',
+                !$current_state ? 'on' : 'off',
+                date('Y-m-d H:i:s', $next_state_timestamp)
+            );
+        }
+
+        dd(
+            [
+                'data' => $next_state_timestamp,
+                'message' => $message,
+            ]
+        );
+
+        return response(
+            [
+                'data' => $next_state_timestamp,
+                'message' => $message,
+            ]
+        );
+        dump('timeline');
+        dd($timeline);
+
+        return 'result';
+
         $period = CarbonPeriod::create($date_time, $first_change_timestamp);
         $result = null;
         $diff = $period->count();
@@ -87,7 +138,7 @@ class OpenHoursController extends Controller
                 $date_time->setTime(00, 00);
             }
             $day_plan = dayPlan($open_hours[$date->dayOfWeek] ?? collect());
-            $exceptionsBetween = $exceptions->filter(
+            $day_exceptions = $exceptions->filter(
                 function ($exception) use ($date, $index, $diff) {
                     $start = $date->clone()->setTime(00, 00);
                     $end = $date->clone()->setTime(24, 00);
@@ -102,10 +153,10 @@ class OpenHoursController extends Controller
                 }
             );
             $full_day_plan = $day_plan;
-            if ($exceptionsBetween->count()) {
+            if ($day_exceptions->count()) {
                 $full_day_plan = applyExceptions(
                     $day_plan,
-                    $exceptionsBetween,
+                    $day_exceptions,
                     $date
                 );
             }

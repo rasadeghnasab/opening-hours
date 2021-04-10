@@ -78,6 +78,10 @@ class StationNextStateChangeTest extends TestCase
                 'GET',
                 sprintf('%s?timestamp=%s', sprintf($this->uri, $station->id), $test['timestamp']),
             );
+            $result = $response->json(['data']);
+            $format = 'Y-m-d H:i:s';
+            dd(date($format, $result), date($format, strtotime($test['expected'])));
+//            dd($response->dump());
 
             $response->assertStatus(200);
             $this->assertEquals(strtotime($test['expected']), $response->json('data'));
@@ -91,93 +95,93 @@ class StationNextStateChangeTest extends TestCase
     {
         $data = [];
 
-        $data[] = [
-            'preparation' => [
-                'station' => [
-                    'open_hours' => [
-                        [
-                            'day' => date('w'),
-                            'from' => '08:00',
-                            'to' => '18:00',
-                        ]
-                    ],
-                ]
-            ],
-            'tests' => [
-                ['timestamp' => strtotime('today 7:00'), 'expected' => 'today 08:00'],
-                ['timestamp' => strtotime('today 12:00'), 'expected' => 'today 18:00'],
-                ['timestamp' => strtotime('today 18:00'), 'expected' => sprintf('next %s 8:00', date('l'))],
-            ]
-        ];
+//        $data[] = [
+//            'preparation' => [
+//                'station' => [
+//                    'open_hours' => [
+//                        [
+//                            'day' => date('w'),
+//                            'from' => '08:00',
+//                            'to' => '18:00',
+//                        ]
+//                    ],
+//                ]
+//            ],
+//            'tests' => [
+//                ['timestamp' => strtotime('today 7:00'), 'expected' => 'today 08:00'],
+//                ['timestamp' => strtotime('today 12:00'), 'expected' => 'today 18:00'],
+//                ['timestamp' => strtotime('today 18:00'), 'expected' => sprintf('next %s 8:00', date('l'))],
+//            ]
+//        ];
 
-        $data[] = [
-            'preparation' => [
-                'station' => [
-                    'open_hours' => [
-                        [
-                            'day' => date('w'),
-                            'from' => '08:00',
-                            'to' => '18:00',
-                        ],
-                    ],
-                ],
-                'store' => [
-                    'open_hours' => [
-                        [
-                            'day' => date('w'),
-                            'from' => '04:00',
-                            'to' => '19:00',
-                        ]
-                    ]
-                ]
-            ],
-            'tests' => [
-                ['timestamp' => strtotime('today 3:00'), 'expected' => 'today 04:00'],
-                ['timestamp' => strtotime('today 12:00'), 'expected' => 'today 19:00'],
-                ['timestamp' => strtotime('today 18:30'), 'expected' => 'today 19:00'],
-                ['timestamp' => strtotime('today 19:30'), 'expected' => sprintf('next %s 4:00', date('l'))],
-            ]
-        ];
+//        $data[] = [
+//            'preparation' => [
+//                'station' => [
+//                    'open_hours' => [
+//                        [
+//                            'day' => date('w'),
+//                            'from' => '08:00',
+//                            'to' => '18:00',
+//                        ],
+//                    ],
+//                ],
+//                'store' => [
+//                    'open_hours' => [
+//                        [
+//                            'day' => date('w'),
+//                            'from' => '04:00',
+//                            'to' => '19:00',
+//                        ]
+//                    ]
+//                ]
+//            ],
+//            'tests' => [
+//                ['timestamp' => strtotime('today 3:00'), 'expected' => 'today 04:00'],
+//                ['timestamp' => strtotime('today 12:00'), 'expected' => 'today 19:00'],
+//                ['timestamp' => strtotime('today 18:30'), 'expected' => 'today 19:00'],
+//                ['timestamp' => strtotime('today 19:30'), 'expected' => sprintf('next %s 4:00', date('l'))],
+//            ]
+//        ];
 
-        $data[] = [
-            'preparation' => [
-                'station' => [
-                    'open_hours' => [
-                        [
-                            'day' => date('w'),
-                            'from' => '08:00',
-                            'to' => '18:00',
-                        ],
-                    ],
-                ],
-                'store' => [
-                    'open_hours' => [
-                        [
-                            'day' => date('w'),
-                            'from' => '04:00',
-                            'to' => '19:00',
-                        ]
-                    ]
-                ],
-                'tenant' => [
-                    'open_hours' => [
-                        [
-                            'day' => date('w'),
-                            'from' => '03:00',
-                            'to' => '20:00',
-                        ]
-                    ]
-                ]
-            ],
-            'tests' => [
-                ['timestamp' => strtotime('today 2:00'), 'expected' => 'today 03:00'],
-                ['timestamp' => strtotime('today 03:00'), 'expected' => 'today 20:00'],
-                ['timestamp' => strtotime('today 12:00'), 'expected' => 'today 20:00'],
-                ['timestamp' => strtotime('today 18:00'), 'expected' => 'today 20:00'],
-                ['timestamp' => strtotime('today 19:00'), 'expected' => 'today 20:00'],
-                ['timestamp' => strtotime('today 21:00'), 'expected' => sprintf('next %s 3:00', date('l'))],
-            ]
-        ];
+//        $data[] = [
+//            'preparation' => [
+//                'station' => [
+//                    'open_hours' => [
+//                        [
+//                            'day' => date('w'),
+//                            'from' => '08:00',
+//                            'to' => '18:00',
+//                        ],
+//                    ],
+//                ],
+//                'store' => [
+//                    'open_hours' => [
+//                        [
+//                            'day' => date('w'),
+//                            'from' => '04:00',
+//                            'to' => '19:00',
+//                        ]
+//                    ]
+//                ],
+//                'tenant' => [
+//                    'open_hours' => [
+//                        [
+//                            'day' => date('w'),
+//                            'from' => '03:00',
+//                            'to' => '20:00',
+//                        ]
+//                    ]
+//                ]
+//            ],
+//            'tests' => [
+//                ['timestamp' => strtotime('today 2:00'), 'expected' => 'today 03:00'],
+//                ['timestamp' => strtotime('today 03:00'), 'expected' => 'today 20:00'],
+//                ['timestamp' => strtotime('today 12:00'), 'expected' => 'today 20:00'],
+//                ['timestamp' => strtotime('today 18:00'), 'expected' => 'today 20:00'],
+//                ['timestamp' => strtotime('today 19:00'), 'expected' => 'today 20:00'],
+//                ['timestamp' => strtotime('today 21:00'), 'expected' => sprintf('next %s 3:00', date('l'))],
+//            ]
+//        ];
 
         $data[] = [
             'preparation' => [
@@ -223,6 +227,8 @@ class StationNextStateChangeTest extends TestCase
                 ['timestamp' => strtotime('+1 week 09:01'), 'expected' => '+1 week 18:00'],
             ]
         ];
+
+        return $data;
 
         $data[] = [
             'preparation' => [
