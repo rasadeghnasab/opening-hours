@@ -69,7 +69,6 @@ class OpenHoursController extends Controller
             ->isAfter($date_time->clone()->setTime(00, 00))
             ->get();
 
-
         $open_hours = $station->openHours()->orderBy('from')->get()->groupBy('day');
 
         $first_change_timestamp =
