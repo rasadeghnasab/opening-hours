@@ -82,10 +82,10 @@ class OpenHoursController extends Controller
         $timeline = (new Timeline($open_hours))
             ->generate($date_time, $first_change_timestamp)
             ->applyExceptions($exceptions)
-//            ->toDateTime();
-            ->timeline();
+            ->toDateTime();
+//            ->timeline();
 //        dump('timestamp');
-//        dd($timeline);
+        dd($timeline);
 
 //        while (count($timeline) > 0) {
         $next_state_timestamp = null;
@@ -102,6 +102,7 @@ class OpenHoursController extends Controller
                 break;
             }
         }
+        dd($timeline);
 
         if ($next_state_timestamp) {
             $message = sprintf(

@@ -61,14 +61,25 @@ class Timeline
 
     public function applyExceptions(Collection $exceptions): self
     {
-        $grouped_exceptions = $exceptions->groupBy('status');
+        $priorities = TimeablePriority::orderBy('priority')->get();
+        $exceptions_by_timeable = $exceptions->groupBy('timeable_type');
 
-        if (isset($grouped_exceptions[1])) {
-            $this->addOpenExceptions($grouped_exceptions[1]);
-        }
+        foreach($priorities as $priority) {
+            if(!isset($exceptions_by_timeable[$priority->name]) || empty($exceptions_by_timeable[$priority->name])) {
+                continue;
+            }
 
-        if (isset($grouped_exceptions[0])) {
-            $this->removeClosedExceptions($grouped_exceptions[0]);
+            $timeable_exceptions = $exceptions_by_timeable[$priority->name];
+
+            $exceptions_by_status = $timeable_exceptions->groupBy('status');
+
+            if (isset($exceptions_by_status[1])) {
+                $this->addOpenExceptions($exceptions_by_status[1]);
+            }
+
+            if (isset($exceptions_by_status[0])) {
+                $this->removeClosedExceptions($exceptions_by_status[0]);
+            }
         }
 
         return $this;
