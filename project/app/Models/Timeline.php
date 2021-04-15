@@ -44,6 +44,7 @@ class Timeline
                     continue;
                 }
 
+//                dump($date->toDateTimeString() . '----------------------' . $date->dayOfWeek);
                 $format = 'Y-m-d H:i:s';
                 $this->timeline->push(
                     [
@@ -64,8 +65,8 @@ class Timeline
         $priorities = TimeablePriority::orderBy('priority')->get();
         $exceptions_by_timeable = $exceptions->groupBy('timeable_type');
 
-        foreach($priorities as $priority) {
-            if(!isset($exceptions_by_timeable[$priority->name]) || empty($exceptions_by_timeable[$priority->name])) {
+        foreach ($priorities as $priority) {
+            if (!isset($exceptions_by_timeable[$priority->name]) || empty($exceptions_by_timeable[$priority->name])) {
                 continue;
             }
 
@@ -126,9 +127,11 @@ class Timeline
 
             $close_timeline->push(['from' => $from, 'to' => $to]);
         }
-
         $close_timeline = $close_timeline->merge($close_exceptions->toArray());
-        $close_timeline->sortBy('from')->toArray();
+        $close_timeline = $close_timeline->sortBy('from');
+        $this->timeline = $close_timeline;
+        dd($this->toDateTime());
+        dd($close_timeline);
 
         $this->timeline = $this->removeOverlaps($close_timeline);
 
@@ -152,29 +155,34 @@ class Timeline
      */
     private function removeOverlaps(Collection $timeline): Collection
     {
-        $stack = collect();
+        $output = collect();
+        $timeline = $timeline->sortBy('from');
 
         foreach ($timeline as $current_item) {
-            if ($last_item = $stack->pop()) {
+            if ($last_item = $output->pop()) {
                 if ($current_item['from'] <= $last_item['to']) {
-                    $current_item['from'] = $last_item['from'];
-                    $current_item['to'] = max($last_item['to'], $current_item['to']);
-                    $stack->push($current_item);
+                    $output->push(
+                        [
+                            'from' => $last_item['from'],
+                            'to' => max($last_item['to'], $current_item['to']),
+                        ]
+                    );
+                    $output->push($current_item);
                     continue;
                 }
-                $stack->push($last_item);
+                $output->push($last_item);
             }
-            $stack->push($current_item);
+            $output->push($current_item);
         }
 
-        return $stack;
+        return $output;
     }
 
     public function toDateTime()
     {
         $new_timeline = [];
         $format = 'Y-m-d H:i:s';
-        foreach($this->timeline->sortBy('from') as $item) {
+        foreach ($this->timeline->sortBy('from') as $item) {
             $new_timeline[] = [
                 'from' => date($format, $item['from']),
                 'to' => date($format, $item['to']),
