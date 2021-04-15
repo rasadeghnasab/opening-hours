@@ -31,10 +31,29 @@ if (!function_exists('dayPlan')) {
      */
     function dayPlan(Collection $day_times, string $start_time = '00:00', string $end_time = '24:00'): Collection
     {
+//        $day_times->push([
+//            'from' => $start_time,
+//            'to' => $end_time
+//                         ]);
+//        dump($day_times->pluck('from')->sort());
+//        dd($day_times->pluck('to')->sort());
+        $froms = $day_times->pluck('from')->sort();
+        $tos = $day_times->pluck('to')->sort();
+//        dd($all);
+
+        $time_ranges = $froms->combine($tos);
+        dd($time_ranges);
+//        dd($time_ranges->map(function($time_range, $index) {
+//            dd($index,$time_range);
+//        }));
+
+        return 'h';
         $day = $day_times->whereNotNull('day')->first()['day'] ?? null;
         $next_start = $end_time;
         $output = collect();
         $min = $day_times->min('from');
+        $max = $day_times->max('to');
+
         if ($min > $start_time) {
             $output->push(
                 [
@@ -64,7 +83,7 @@ if (!function_exists('dayPlan')) {
                 $next_start = $time_range['to'];
             }
         }
-        $max = $day_times->max('to');
+
         if ($max < $end_time) {
             $output->push(
                 [

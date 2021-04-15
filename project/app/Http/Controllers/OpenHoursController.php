@@ -80,23 +80,24 @@ class OpenHoursController extends Controller
 
         $period = CarbonPeriod::create($date_time, $first_change_timestamp);
         $result = null;
-        $diff = $period->count();
+        $last_day = $period->count();
 
         foreach ($period as $index => $date) {
-            if ($index > 0) {
-                $date_time->setTime(00, 00);
-            }
+            // We check the time at the end
+//            if ($index > 0) {
+//                $date_time->setTime(00, 00);
+//            }
             $day_plan = dayPlan($open_hours[$date->dayOfWeek] ?? collect());
             $day_exceptions = $exceptions->filter(
-                function ($exception) use ($date, $index, $diff) {
+                function ($exception) use ($date, $index) {
                     $start = $date->clone()->setTime(00, 00);
                     $end = $date->clone()->setTime(24, 00);
 
-                    if ($index === $diff) {
-                        // last date should end before the start time
-                        $end->setTime($date->hour, $date->minute);
-                    }
-
+//                    if ($index === $last_day) {
+//                        // last date should end before the start time
+//                        $end->setTime($date->hour, $date->minute);
+//                    }
+//
                     return ($exception->from->gte($start) && $exception->from->lt($end))
                         || ($exception->from->lte($date) || $exception->to->gte($date));
                 }
@@ -112,7 +113,8 @@ class OpenHoursController extends Controller
 
             $changed = $full_day_plan->filter(
                 function ($plan) use ($current_state, $date_time) {
-                    return $plan['status'] != $current_state && $plan['from'] >= $date_time->toTimeString();
+                    return $plan['status'] != $current_state && $plan['from'] >= $date_time->toTimeString()
+                    && $plan['from'] <= $date_time->toTimeString();
                 }
             )->first();
 
