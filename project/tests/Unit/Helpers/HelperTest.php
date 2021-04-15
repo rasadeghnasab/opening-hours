@@ -99,7 +99,7 @@ class HelperTest extends TestCase
                         "from" => "06:00:00",
                         "to" => "09:00:00",
                         "status" => 0,
-                        'day' => 6,
+                        'day' => Carbon::now()->dayOfWeek,
                     ],
                     [
                         "from" => "09:00:00",
@@ -111,7 +111,7 @@ class HelperTest extends TestCase
                         "from" => "14:00:00",
                         "to" => "15:00:00",
                         "status" => 0,
-                        'day' => 6
+                        'day' => Carbon::now()->dayOfWeek,
                     ],
                     [
                         "from" => "15:00:00",
@@ -163,7 +163,7 @@ class HelperTest extends TestCase
                         "from" => "06:00:00",
                         "to" => "09:00:00",
                         "status" => 0,
-                        'day' => 6,
+                        'day' => Carbon::now()->dayOfWeek,
                     ],
                     [
                         "from" => "09:00:00",
