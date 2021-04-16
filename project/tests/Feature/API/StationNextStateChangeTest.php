@@ -78,6 +78,7 @@ class StationNextStateChangeTest extends TestCase
                 'GET',
                 sprintf('%s?timestamp=%s', sprintf($this->uri, $station->id), $test['timestamp']),
             );
+//            dd($response->dump());
 
             $response->assertStatus(200);
             $this->assertEquals(strtotime($test['expected']), $response->json('data'));
@@ -276,6 +277,7 @@ class StationNextStateChangeTest extends TestCase
                 ['timestamp' => strtotime('today 14:30'), 'expected' => 'today 15:00'],
                 ['timestamp' => strtotime('today 15:00'), 'expected' => 'today 15:00'],
                 ['timestamp' => strtotime('today 15:01'), 'expected' => 'today 21:00'],
+                ['timestamp' => strtotime('today 15:00'), 'expected' => 'today 15:00'],
             ]
         ];
 
