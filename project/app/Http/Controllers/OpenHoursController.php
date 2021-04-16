@@ -10,6 +10,7 @@ use App\Http\Requests\OpenHours\OpenHourStoreRequest;
 use App\Interfaces\TimeableInterface;
 use App\Models\OpenHour;
 use App\Models\Station;
+use App\Models\TimeablePriority;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 
@@ -81,8 +82,13 @@ class OpenHoursController extends Controller
                 ->first()->from
             ?? $from->clone()->addWeek();
 
+        // If we want to add any other entities we can do that
+        // just by adding the name in the timeables_priority table
+        $timeables_priority = TimeablePriority::orderBy('priority')->get();
+        $exceptions_hours = (new ExceptionsHours($exceptions))->addTimeablesPriorities($timeables_priority);
+
         $timeline = (new Timeline(new WeekPlan($open_hours)))
-            ->addExceptions(new ExceptionsHours($exceptions))
+            ->addExceptions($exceptions_hours)
             ->generate($from, $first_change);
 
         $next_change = $timeline->nextStateChange($current_state);

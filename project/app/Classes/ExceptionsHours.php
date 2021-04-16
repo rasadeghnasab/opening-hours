@@ -18,9 +18,26 @@ class ExceptionsHours
      */
     private Carbon $date;
 
+    private Collection $timeables_priority;
+
     public function __construct(Collection $exceptions)
     {
         $this->exceptions = $exceptions;
+        $this->timeables_priority = collect();
+    }
+
+    public function addTimeablesPriorities(Collection $timeable_priorities): self
+    {
+        foreach ($timeable_priorities as $timeable_priority) {
+            $this->addTimeablePriority($timeable_priority);
+        }
+
+        return $this;
+    }
+
+    private function addTimeablePriority(TimeablePriority $timeablePriority): void
+    {
+        $this->timeables_priority->push($timeablePriority);
     }
 
     /**
@@ -33,15 +50,18 @@ class ExceptionsHours
         $this->date = $date;
         $exceptions = $this->findDateExceptions();
         if ($exceptions->count()) {
-            $timeables_priority = TimeablePriority::orderBy('priority')->get();
             $exceptions = $exceptions->groupBy('timeable_type');
+            $timeables_priority =
+                $this->timeables_priority->isEmpty() ?
+                    $exceptions->keys() :
+                    $this->timeables_priority->sortBy('priority')->pluck('name');
 
-            foreach ($timeables_priority as $timeable) {
-                if (!isset($exceptions[$timeable->name])) {
+            foreach ($timeables_priority as $timeable_name) {
+                if (!isset($exceptions[$timeable_name])) {
                     continue;
                 }
 
-                $day_plan = $this->overwriteTimes($day_plan, $exceptions[$timeable->name]);
+                $day_plan = $this->overwriteTimes($day_plan, $exceptions[$timeable_name]);
             }
         }
 

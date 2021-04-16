@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
+use App\Models\TimeablePriority;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
