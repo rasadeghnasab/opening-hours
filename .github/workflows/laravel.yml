@@ -16,7 +16,7 @@ jobs:
       with:
         php-version: '7.4'
     - name: Change working directory to project
-      - run: cd projects
+      run: cd projects
     - uses: actions/checkout@v2
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
