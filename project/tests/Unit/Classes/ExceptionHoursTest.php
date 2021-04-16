@@ -37,7 +37,7 @@ class ExceptionHoursTest extends TestCase
         );
         OpenHourException::reguard();
 
-        $plan = (new DayPlan($plan, $date))->generate();
+        $plan = (new DayPlan($plan, $date))->fullPlan();
         $full_plan = (new ExceptionsHours($exceptions))->applyExceptions($plan, $date);
 
         $this->assertEquals($expected, $full_plan->toArray());

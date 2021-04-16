@@ -19,7 +19,7 @@ class DayPlanTest extends TestCase
      */
     public function can_generate_full_day_plan_for_a_day(Collection $day_plan, Carbon $date, Collection $expected): void
     {
-        $day_plan = (new DayPlan($day_plan, $date))->generate();
+        $day_plan = (new DayPlan($day_plan, $date))->fullPlan();
 
         $this->assertEquals($expected->toArray(), $day_plan->toArray());
     }

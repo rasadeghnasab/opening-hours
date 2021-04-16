@@ -48,9 +48,7 @@ class Timeline
         $period = CarbonPeriod::create($this->from, $this->to);
 
         foreach ($period as $date) {
-            $day_plan = $this->week_plan->day($date);
-
-            $day_full_plan = $day_plan->generate();
+            $day_full_plan = $this->week_plan->day($date)->fullPlan();
             $day_full_plan = $this->exceptions->applyExceptions($day_full_plan, $date);
 
             $this->timeline->put($date->toDateTimeString(), $day_full_plan);

@@ -22,7 +22,7 @@ class DayPlan
         $this->date = $date;
     }
 
-    public function generate($start_time = '00:00', $end_time = '24:00'): Collection
+    public function fullPlan($start_time = '00:00', $end_time = '24:00'): Collection
     {
         $next_start = $end_time;
         $output = collect();
