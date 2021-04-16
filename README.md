@@ -17,8 +17,8 @@ You have to have `docker` and `docker-composer` installed on your system in orde
 3. up and run the whole project
     - `make project`
 
-4. you can have access to the APIs using these routes OR you can just download the Postman and call them
-    - 
+4. you can find the API documentation and usage example
+    - https://documenter.getpostman.com/view/844555/TzJrDKyh
 
 ---
 # A quick note for the reviewers
