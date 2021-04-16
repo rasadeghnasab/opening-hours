@@ -24,28 +24,6 @@ class ExceptionsHours
     }
 
     /**
-     * @return Collection
-     */
-    private function findDateExceptions(): Collection
-    {
-        return $this->exceptions->filter(
-            function ($exception) {
-                $start = $this->date->clone()->setTime(00, 00);
-                $end = $this->date->clone()->setTime(24, 00);
-
-//                dump(
-//                    $exception->from->toDateTimeString(),
-//                    $exception->to->toDateTimeString(),
-//                    $start->toDateTimeString(),
-//                    $end->toDateTimeString()
-//                );
-
-                return $exception->from->lte($end) && $exception->to->gte($start);
-            }
-        );
-    }
-
-    /**
      * @param Collection $day_plan
      * @param Carbon $date
      * @return Collection
@@ -63,16 +41,26 @@ class ExceptionsHours
                     continue;
                 }
 
-//                dump($day_plan->toArray());
-//                dump('-------------------------------');
                 $day_plan = $this->overwriteTimes($day_plan, $exceptions[$timeable->name]);
-//                dd($day_plan->toArray());
             }
         }
-//        dump('day_plan exception added');
-//        dd($day_plan->toArray());
 
         return $day_plan;
+    }
+
+    /**
+     * @return Collection
+     */
+    private function findDateExceptions(): Collection
+    {
+        return $this->exceptions->filter(
+            function ($exception) {
+                $start = $this->date->clone()->setTime(00, 00);
+                $end = $this->date->clone()->setTime(24, 00);
+
+                return $exception->from->lte($end) && $exception->to->gte($start);
+            }
+        );
     }
 
     /**
@@ -99,7 +87,6 @@ class ExceptionsHours
 
                 if (!$has_intersect) {
                     if ($start <= $time_range['from']) {
-//                        dump($time_range);
                         $output->push($time_range);
                         $start = $time_range['to'];
                     }
@@ -129,7 +116,6 @@ class ExceptionsHours
                             'day' => $time_range['day'] ?? null,
                         ]
                     );
-//                    dump($from . '-' . $exception_from, $exception_to . '-' . $to);
                     $start = $to;
                     continue;
                 } elseif ($from && is_null($to)) {
@@ -141,7 +127,6 @@ class ExceptionsHours
                             'day' => $time_range['day'] ?? null,
                         ]
                     );
-//                    dump($from . '-' . $exception_from);
                     $start = $time_range['to'];
                 } elseif (is_null($from) && $to) {
                     $start = $exception_to;
@@ -155,7 +140,6 @@ class ExceptionsHours
                                 'day' => $time_range['day'] ?? null,
                             ]
                         );
-//                        dump($exception_to . '-'. $time_range['to']);
                         continue;
                     }
                     break;
@@ -163,10 +147,6 @@ class ExceptionsHours
             }
         }
 
-//        dump($output->toArray());
-//        dump('----------------------------');
-//        dump($exceptions->toArray());
-//        dump('----------------------------');
         $output = $output->merge(
             $exceptions->map(
                 function ($exception) {
@@ -188,7 +168,7 @@ class ExceptionsHours
                 return $time_range['from'] !== $time_range['to'];
             }
         )->sortBy('from')->values();
-//        dd($output);
+
         return $output;
     }
 }

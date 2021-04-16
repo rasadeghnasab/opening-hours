@@ -47,28 +47,15 @@ class Timeline
         $this->to = $to;
         $period = CarbonPeriod::create($this->from, $this->to);
 
-        $first_date = $period->first()->toDateString();
-        $last_date = $period->last()->toDateString();
-
         foreach ($period as $date) {
             $day_plan = $this->open_hours[$date->dayOfWeek] ?? collect();
 
-            $start_time = $first_date === $date->toDateString() ? $date->toTimeString() : '00:00';
-            $end_time = $last_date === $date->toDateString() ? $date->toTimeString() : '24:00';
-
-//            dump($day_plan->toArray(), $start_time, $end_time);
             $day_full_plan = (new DayPlan($day_plan, $date))->generate();
-//            dd($day_full_plan, $date->toDateTimeString());
             $day_full_plan = $this->exceptions->applyExceptions($day_full_plan, $date);
-//            dd($day_full_plan->toArray());
-//            dump('-----------------------');
-
 
             $this->timeline->put($date->toDateTimeString(), $day_full_plan);
         }
 
-//        dd('end');
-//        dd($this->timeline->toArray());
         return $this;
     }
 
@@ -88,8 +75,13 @@ class Timeline
         $result = null;
         foreach ($this->timeline as $date => $day_plan) {
             $changed = $day_plan->filter(
-                function ($plan) use ($current_state) {
-                    return $plan['status'] != $current_state;
+                function ($plan) use ($current_state, $date) {
+                    $date_time = Carbon::createFromFormat('Y-m-d H:i:s', $date)
+                        ->setTime(...(explode(":", $plan['from'])));
+
+                    return $plan['status'] != $current_state
+                        && $date_time->gte($this->from)
+                        && $date_time->lte($this->to);
                 }
             )->first();
 

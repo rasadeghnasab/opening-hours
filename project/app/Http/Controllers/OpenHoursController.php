@@ -83,7 +83,6 @@ class OpenHoursController extends Controller
             ->addExceptions($exceptions)
             ->generate($from, $first_change);
 
-//        dd($timeline->timeline()->toArray());
         $next_change = $timeline->nextStateChange($current_state);
 
         $result = null;
