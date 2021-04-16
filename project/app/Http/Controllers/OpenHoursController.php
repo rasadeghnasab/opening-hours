@@ -89,6 +89,7 @@ class OpenHoursController extends Controller
 
         $result = null;
         $message = sprintf('The station will be always %s', $current_state ? 'on' : 'off');
+
         if ($next_change) {
             $message = sprintf(
                 'The station state will change to %s on %s',
