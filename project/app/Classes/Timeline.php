@@ -9,9 +9,9 @@ use Illuminate\Support\Collection;
 class Timeline
 {
     /**
-     * @var Collection
+     * @var WeekPlan
      */
-    private Collection $open_hours;
+    private WeekPlan $week_plan;
 
     /**
      * @var Collection
@@ -30,9 +30,9 @@ class Timeline
      */
     private ExceptionsHours $exceptions;
 
-    public function __construct(Collection $open_hours)
+    public function __construct(WeekPlan $week_plan)
     {
-        $this->open_hours = $open_hours;
+        $this->week_plan = $week_plan;
         $this->timeline = collect();
     }
 
@@ -48,9 +48,9 @@ class Timeline
         $period = CarbonPeriod::create($this->from, $this->to);
 
         foreach ($period as $date) {
-            $day_plan = $this->open_hours[$date->dayOfWeek] ?? collect();
+            $day_plan = $this->week_plan->day($date);
 
-            $day_full_plan = (new DayPlan($day_plan, $date))->generate();
+            $day_full_plan = $day_plan->generate();
             $day_full_plan = $this->exceptions->applyExceptions($day_full_plan, $date);
 
             $this->timeline->put($date->toDateTimeString(), $day_full_plan);
@@ -59,9 +59,9 @@ class Timeline
         return $this;
     }
 
-    public function addExceptions(Collection $exceptions): self
+    public function addExceptions(ExceptionsHours $exceptions): self
     {
-        $this->exceptions = new ExceptionsHours($exceptions);
+        $this->exceptions = $exceptions;
 
         return $this;
     }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\ExceptionsHours;
 use App\Classes\Timeline;
+use App\Classes\WeekPlan;
 use App\Http\Requests\OpenHours\CheckStationStatusRequest;
 use App\Http\Requests\OpenHours\OpenHourStoreRequest;
 use App\Interfaces\TimeableInterface;
@@ -79,8 +81,8 @@ class OpenHoursController extends Controller
                 ->first()->from
             ?? $from->clone()->addWeek();
 
-        $timeline = (new Timeline($open_hours))
-            ->addExceptions($exceptions)
+        $timeline = (new Timeline(new WeekPlan($open_hours)))
+            ->addExceptions(new ExceptionsHours($exceptions))
             ->generate($from, $first_change);
 
         $next_change = $timeline->nextStateChange($current_state);

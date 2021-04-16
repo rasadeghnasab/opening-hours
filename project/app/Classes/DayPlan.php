@@ -139,9 +139,4 @@ class DayPlan
 
         return $full_day_plan;
     }
-
-    private function thereIsAGap(array $current_range, array $next_range): bool
-    {
-        return $current_range['to'] < $next_range['from'];
-    }
 }
