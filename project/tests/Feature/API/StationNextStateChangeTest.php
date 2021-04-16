@@ -73,7 +73,6 @@ class StationNextStateChangeTest extends TestCase
     {
         $station = $this->create_entities_open_hours_and_exceptions($preparation_data);
 
-        $format = 'Y-m-d H:i:s';
         foreach ($tests as $test) {
             $response = $this->json(
                 'GET',
