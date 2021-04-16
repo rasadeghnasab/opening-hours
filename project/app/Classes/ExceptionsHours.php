@@ -76,14 +76,17 @@ class ExceptionsHours
 
         $start = '00:00';
         foreach ($exceptions as $index => $exception) {
-            $exception_from = $exception->from->toDateString() < $this->date->toDateString(
-            ) ? "00:00" : $exception->from->toTimeString();
-            $exception_to = $exception->to->toDateString() > $this->date->toDateString(
-            ) ? '24:00' : $exception->to->toTimeString();
+            $exception_from = $exception->from->toDateString() < $this->date->toDateString()
+                ? "00:00" : $exception->from->toTimeString();
+
+            $exception_to = $exception->to->toDateString() > $this->date->toDateString()
+                ? '24:00' : $exception->to->toTimeString();
 
             foreach ($day_plan as $time_range) {
                 // exception and time_range have intersect
-                $has_intersect = ($time_range['from'] < $exception_to) && ($time_range['to'] > $exception_from);
+                $has_intersect =
+                    ($time_range['from'] < $exception_to) &&
+                    ($time_range['to'] > $exception_from);
 
                 if (!$has_intersect) {
                     if ($start <= $time_range['from']) {
@@ -147,7 +150,7 @@ class ExceptionsHours
             }
         }
 
-        $output = $output->merge(
+        return $output->merge(
             $exceptions->map(
                 function ($exception) {
                     $exception_from = $exception->from->toDateString() < $this->date->toDateString()
@@ -168,7 +171,5 @@ class ExceptionsHours
                 return $time_range['from'] !== $time_range['to'];
             }
         )->sortBy('from')->values();
-
-        return $output;
     }
 }
