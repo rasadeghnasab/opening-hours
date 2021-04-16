@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Station;
 use App\Models\Store;
-use Illuminate\Http\Request;
 
 class StationsController extends Controller
 {
@@ -27,13 +26,14 @@ class StationsController extends Controller
      */
     public function store(Store $store)
     {
+        // station has no property than store_id
         $station = new Station();
 
         $store->stations()->save($station);
 
         return response(
             [
-                'message' => 'Tenant created successfully.',
+                'message' => 'Station created successfully.',
                 'data' => ['station' => $station],
             ],
             201
@@ -43,16 +43,17 @@ class StationsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Station  $station
+     * @param Store $store
+     * @param \App\Models\Station $station
      * @return \Illuminate\Http\Response
      */
-    public function show(Station $station)
+    public function show(Store $store, Station $station)
     {
         return response(
             [
                 'message' => 'Model retrieved successfully.',
                 'data' => [
-                    'tenant' => $station
+                    'station' => $station
                 ]
             ]
         );
