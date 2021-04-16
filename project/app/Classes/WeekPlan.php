@@ -14,7 +14,7 @@ class WeekPlan
 
     public function __construct(Collection $plan)
     {
-        $this->plan = $plan;
+        $this->plan = $plan->sortBy('from')->groupBy('day');
     }
 
     /**

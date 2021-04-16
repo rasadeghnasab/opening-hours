@@ -71,10 +71,11 @@ class OpenHoursController extends Controller
             ->isAfter($from->clone()->setTime(00, 00))
             ->get();
 
-        $open_hours = $station->openHours()->orderBy('from')->get()->groupBy('day');
+        $open_hours = $station->openHours()->get();
+        $timeables_priority = TimeablePriority::orderBy('priority')->get();
 
-        // If we found a state change in the exceptions we can make sure the state will change on that time MAX
-        // Otherwise we should search a complete week for the state change
+        // If we found a state change in the future exceptions we can make sure the state will change on that time,
+        // otherwise we should search a complete week for the state change
         $first_change =
             $exceptions
                 ->where('status', !$current_state)
@@ -84,8 +85,7 @@ class OpenHoursController extends Controller
 
         // If we want to add any other entities we can do that
         // just by adding the name in the timeables_priority table
-        $timeables_priority = TimeablePriority::orderBy('priority')->get();
-        $exceptions_hours = (new ExceptionsHours($exceptions))->addTimeablesPriorities($timeables_priority);
+        $exceptions_hours = (new ExceptionsHours($exceptions))->addPriorities($timeables_priority);
 
         $timeline = (new Timeline(new WeekPlan($open_hours)))
             ->addExceptions($exceptions_hours)

@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
+use App\Models\OpenHourException;
 use App\Models\TimeablePriority;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -22,11 +23,12 @@ class ExceptionsHours
 
     public function __construct(Collection $exceptions)
     {
-        $this->exceptions = $exceptions;
+        $this->exceptions = collect();
+        $this->addExceptions($exceptions);
         $this->timeables_priority = collect();
     }
 
-    public function addTimeablesPriorities(Collection $timeable_priorities): self
+    public function addPriorities(Collection $timeable_priorities): self
     {
         foreach ($timeable_priorities as $timeable_priority) {
             $this->addTimeablePriority($timeable_priority);
@@ -35,9 +37,17 @@ class ExceptionsHours
         return $this;
     }
 
-    private function addTimeablePriority(TimeablePriority $timeablePriority): void
+    /**
+     * @param Collection $exceptions
+     * @return $this|void
+     */
+    public function addExceptions(Collection $exceptions): self
     {
-        $this->timeables_priority->push($timeablePriority);
+        foreach ($exceptions as $exception) {
+            $this->addException($exception);
+        }
+
+        return $this;
     }
 
     /**
@@ -54,7 +64,7 @@ class ExceptionsHours
             $timeables_priority =
                 $this->timeables_priority->isEmpty() ?
                     $exceptions->keys() :
-                    $this->timeables_priority->sortBy('priority')->pluck('name');
+                    $this->timeables_priority;
 
             foreach ($timeables_priority as $timeable_name) {
                 if (!isset($exceptions[$timeable_name])) {
@@ -192,4 +202,20 @@ class ExceptionsHours
             }
         )->sortBy('from')->values();
     }
+
+    /**
+     * @param OpenHourException $exception
+     */
+    private function addException(OpenHourException $exception): void
+    {
+        $this->exceptions->push($exception);
+    }
+
+    private function addTimeablePriority(TimeablePriority $timeable_priority): void
+    {
+        $this->timeables_priority->put($timeable_priority->priority, $timeable_priority->name);
+
+        $this->timeables_priority = $this->timeables_priority->sortKeys();
+    }
+
 }
