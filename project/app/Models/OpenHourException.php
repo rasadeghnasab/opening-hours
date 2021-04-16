@@ -24,8 +24,6 @@ class OpenHourException extends Model implements OpenHourInterface
 
     protected $casts = [
         'status' => 'int',
-        'from' => 'timestamp',
-        'to' => 'timestamp',
     ];
 
     /**

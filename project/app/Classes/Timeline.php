@@ -25,43 +25,82 @@ class Timeline
      * @var Carbon
      */
     private Carbon $to;
+    /**
+     * @var ExceptionsHours
+     */
+    private ExceptionsHours $exceptions;
 
-    public function __construct(Collection $open_hours, Carbon $from, Carbon $to)
+    public function __construct(Collection $open_hours)
     {
         $this->open_hours = $open_hours;
-        $this->from = $from;
-        $this->to = $to;
         $this->timeline = collect();
     }
 
     public function timeline(): Collection
     {
-        return $this->timeline->sortBy('from');
+        return $this->timeline;
     }
-    public function generate(): self
+
+    public function generate(Carbon $from, Carbon $to): self
     {
+        $this->from = $from;
+        $this->to = $to;
         $period = CarbonPeriod::create($this->from, $this->to);
 
+        $first_date = $period->first()->toDateString();
+        $last_date = $period->last()->toDateString();
+
         foreach ($period as $date) {
-            $day_open_hours = $this->open_hours[$date->dayOfWeek] ?? collect();
+            $day_plan = $this->open_hours[$date->dayOfWeek] ?? collect();
 
-            foreach ($day_open_hours as $open_hour) {
-                if ($this->hour_should_not_add($open_hour, $date, $this->from, $this->to)) {
-                    continue;
+            $start_time = $first_date === $date->toDateString() ? $date->toTimeString() : '00:00';
+            $end_time = $last_date === $date->toDateString() ? $date->toTimeString() : '24:00';
+
+//            dump($day_plan->toArray(), $start_time, $end_time);
+            $day_full_plan = (new DayPlan($day_plan, $date))->generate();
+//            dd($day_full_plan, $date->toDateTimeString());
+            $day_full_plan = $this->exceptions->applyExceptions($day_full_plan, $date);
+//            dd($day_full_plan->toArray());
+//            dump('-----------------------');
+
+
+            $this->timeline->put($date->toDateTimeString(), $day_full_plan);
+        }
+
+//        dd('end');
+//        dd($this->timeline->toArray());
+        return $this;
+    }
+
+    public function addExceptions(Collection $exceptions): self
+    {
+        $this->exceptions = new ExceptionsHours($exceptions);
+
+        return $this;
+    }
+
+    /**
+     * @param bool $current_state
+     * @return Carbon|null
+     */
+    public function nextStateChange(bool $current_state): ?Carbon
+    {
+        $result = null;
+        foreach ($this->timeline as $date => $day_plan) {
+            $changed = $day_plan->filter(
+                function ($plan) use ($current_state) {
+                    return $plan['status'] != $current_state;
                 }
+            )->first();
 
-                $format = 'Y-m-d H:i:s';
-                $this->timeline->push(
-                    [
-                        'from' => $date->setTime(...explode(':', $open_hour->from))->timestamp,
-                        'to' => $date->setTime(...explode(':', $open_hour->to))->timestamp,
-//                        'from' => date($format, $date->setTime(...explode(':', $open_hour->from))->timestamp),
-//                        'to' => date($format, $date->setTime(...explode(':', $open_hour->to))->timestamp),
-                    ]
-                );
+            if ($changed) {
+                $result = Carbon::createFromFormat('Y-m-d H:i:s', $date)
+                    ->setTime(...explode(":", $changed['from']));
+
+                break;
             }
         }
 
-        return $this;
+        return $result;
     }
 }

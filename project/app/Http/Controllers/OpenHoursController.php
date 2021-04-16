@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Timeline;
 use App\Http\Requests\OpenHours\CheckStationStatusRequest;
 use App\Http\Requests\OpenHours\OpenHourStoreRequest;
 use App\Interfaces\TimeableInterface;
 use App\Models\OpenHour;
 use App\Models\Station;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
+use Illuminate\Http\Response;
 
 class OpenHoursController extends Controller
 {
@@ -40,9 +41,9 @@ class OpenHoursController extends Controller
      *
      * @param CheckStationStatusRequest $request
      * @param Station $station
-     * @return string
+     * @return \Illuminate\Http\Response
      */
-    public function stateCheck(CheckStationStatusRequest $request, Station $station)
+    public function stateCheck(CheckStationStatusRequest $request, Station $station): Response
     {
         return response(['data' => $station->state($request->get('timestamp'))]);
     }
@@ -55,87 +56,53 @@ class OpenHoursController extends Controller
      * @param Station $station
      * @return \Illuminate\Http\Response
      */
-    public function nextStateChange(CheckStationStatusRequest $request, Station $station)
+    public function nextStateChange(CheckStationStatusRequest $request, Station $station): Response
     {
         $timestamp = $request->get('timestamp');
         $current_state = $station->state($timestamp);
-        $date_time = Carbon::createFromTimestamp($timestamp);
-
-        $next_change = null;
-        $message = sprintf('The station will be always %s', $current_state ? 'on' : 'off');
+        $from = Carbon::createFromTimestamp($timestamp);
 
         $exceptions = $station
             ->exceptions()
-            ->isAfter($date_time->clone()->setTime(00, 00))
+            // midnight
+            ->isAfter($from->clone()->setTime(00, 00))
             ->get();
 
         $open_hours = $station->openHours()->orderBy('from')->get()->groupBy('day');
 
-        $first_change_timestamp =
+        // If we found a state change in the exceptions we can make sure the state will change on that time MAX
+        // Otherwise we should search a complete week for the state change
+        $first_change =
             $exceptions
                 ->where('status', !$current_state)
-                ->where('from', '>=', $date_time->toDateTimeString())
+                ->where('from', '>=', $from->toDateTimeString())
                 ->first()->from
-            ?? $date_time->clone()->addWeek();
+            ?? $from->clone()->addWeek();
 
-        $period = CarbonPeriod::create($date_time, $first_change_timestamp);
+        $timeline = (new Timeline($open_hours))
+            ->addExceptions($exceptions)
+            ->generate($from, $first_change);
+
+//        dd($timeline->timeline()->toArray());
+        $next_change = $timeline->nextStateChange($current_state);
+
         $result = null;
-        $last_day = $period->count();
-
-        foreach ($period as $index => $date) {
-            // We check the time at the end
-//            if ($index > 0) {
-//                $date_time->setTime(00, 00);
-//            }
-            $day_plan = dayPlan($open_hours[$date->dayOfWeek] ?? collect());
-            $day_exceptions = $exceptions->filter(
-                function ($exception) use ($date, $index) {
-                    $start = $date->clone()->setTime(00, 00);
-                    $end = $date->clone()->setTime(24, 00);
-
-//                    if ($index === $last_day) {
-//                        // last date should end before the start time
-//                        $end->setTime($date->hour, $date->minute);
-//                    }
-//
-                    return ($exception->from->gte($start) && $exception->from->lt($end))
-                        || ($exception->from->lte($date) || $exception->to->gte($date));
-                }
+        $message = sprintf('The station will be always %s', $current_state ? 'on' : 'off');
+        if ($next_change) {
+            $message = sprintf(
+                'The station state will change to %s on %s',
+                !$current_state ? 'on' : 'off',
+                $next_change->toDateTimeString()
             );
-            $full_day_plan = $day_plan;
-            if ($day_exceptions->count()) {
-                $full_day_plan = applyExceptions(
-                    $day_plan,
-                    $day_exceptions,
-                    $date
-                );
-            }
-
-            $changed = $full_day_plan->filter(
-                function ($plan) use ($current_state, $date_time) {
-                    return $plan['status'] != $current_state && $plan['from'] >= $date_time->toTimeString()
-                    && $plan['from'] <= $date_time->toTimeString();
-                }
-            )->first();
-
-            if ($changed) {
-                $changed = $date->setTime(...explode(':', $changed['from']));
-                $result = $changed->timestamp;
-                $message = sprintf(
-                    'The station state will change to %s on %s',
-                    !$current_state ? 'on' : 'off',
-                    $changed->toDateTimeString()
-                );
-
-                break;
-            }
+            $result = $next_change->timestamp;
         }
 
         return response(
             [
                 'data' => $result,
                 'message' => $message,
-                'date_time' => $date_time->toDateTimeString()
+                'current_time' => $from->toDateTimeString(),
+                'current_state' => $current_state
             ]
         );
     }
