@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
+use App\Classes\Overwrite\IntersectionManager;
 use App\Models\OpenHourException;
 use App\Models\TimeablePriority;
 use Carbon\Carbon;
@@ -104,35 +105,51 @@ class ExceptionsHours
         $exceptions = $exceptions->sortBy('from');
         $day_plan = $day_plan->sortBy('from');
 
-        $start = '00:00';
+        $next_start = '00:00';
         foreach ($exceptions as $index => $exception) {
-            $exception_from = $exception->from->toDateString() < $this->date->toDateString()
-                ? "00:00" : $exception->from->toTimeString();
-
-            $exception_to = $exception->to->toDateString() > $this->date->toDateString()
-                ? '24:00' : $exception->to->toTimeString();
+            $is_last_item = $exceptions->count() - 1 === $index;
 
             foreach ($day_plan as $time_range) {
+                $intersection_manager = new IntersectionManager(
+                    $exception, $this->date, $time_range, $next_start, $is_last_item
+                );
+
+                $slot_manager = $intersection_manager->slot();
+
+                $output->merge($slot_manager->output());
+                $next_start = $slot_manager->nextStart();
+
+                if($slot_manager->shouldContinue()) {
+                    continue;
+                }
+
+                if($slot_manager->shouldBreak()) {
+                    break;
+                }
+
+                continue; // just comment out code below
+
                 // exception and time_range have intersect
                 $has_intersect =
                     ($time_range['from'] < $exception_to) &&
                     ($time_range['to'] > $exception_from);
 
                 if (!$has_intersect) {
-                    if ($start <= $time_range['from']) {
+                    if ($next_start <= $time_range['from']) {
                         $output->push($time_range);
-                        $start = $time_range['to'];
+                        $next_start = $time_range['to'];
                     }
                     continue;
                 }
 
-                $from = $start < $exception_from ? $start : null;
+                $from = $next_start < $exception_from ? $next_start : null;
                 $to = $time_range['to'] < $exception_to ? null : $time_range['to'];
 
                 if (is_null($from) && is_null($to)) {
-                    $start = $time_range['to'];
+                    $next_start = $time_range['to'];
                     continue;
-                } elseif ($from && $to) {
+                }
+                elseif ($from && $to) {
                     $output->push(
                         [
                             'from' => $from,
@@ -149,9 +166,10 @@ class ExceptionsHours
                             'day' => $time_range['day'] ?? null,
                         ]
                     );
-                    $start = $to;
+                    $next_start = $to;
                     continue;
-                } elseif ($from && is_null($to)) {
+                }
+                elseif ($from && is_null($to)) {
                     $output->push(
                         [
                             'from' => $from,
@@ -160,11 +178,12 @@ class ExceptionsHours
                             'day' => $time_range['day'] ?? null,
                         ]
                     );
-                    $start = $time_range['to'];
-                } elseif (is_null($from) && $to) {
-                    $start = $exception_to;
+                    $next_start = $time_range['to'];
+                }
+                elseif (is_null($from) && $to) {
+                    $next_start = $exception_to;
 
-                    if ($exceptions->count() - 1 === $index) {
+                    if ($is_last_item) {
                         $output->push(
                             [
                                 'from' => $exception_to,
