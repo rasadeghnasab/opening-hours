@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 class IntersectionManager
 {
-    private array $INTERSECTION_TYPES = [
+    private array $intersection_types = [
         '100' => InsideInteraction::class,
         '111' => FullIntersection::class,
         '110' => LeftIntersection::class,
@@ -67,13 +67,13 @@ class IntersectionManager
         $intersection_range = ['from' => $left_intersection, 'to' => $right_intersection];
 
         $index = sprintf('%d%d%d', $has_intersection, is_string($left_intersection), is_string($right_intersection));
-        if (!isset($this->INTERSECTION_TYPES[$index])) {
+        if (!isset($this->intersection_types[$index])) {
             die('intersection not exists');
         }
 
-        $INTERSECTION_CLASS = $this->INTERSECTION_TYPES[$index];
+        $intersection_class_name = $this->intersection_types[$index];
 
-        return new $INTERSECTION_CLASS(
+        return new $intersection_class_name(
             $intersection_range, $this->exception, (array)$this->time_slot,
             $this->date, $this->is_last_item, $this->next_start
         );

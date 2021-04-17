@@ -5,13 +5,6 @@ namespace App\Interfaces;
 interface IntersectionInterface
 {
     /**
-     * Returns a boolean to indicates that whether we should continue the loop or not
-     *
-     * @return bool
-     */
-    public function shouldContinue(): bool;
-
-    /**
      * Returns a boolean to indicates that whether we should break the loop or not
      *
      * @return bool

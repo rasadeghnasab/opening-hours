@@ -119,10 +119,6 @@ class ExceptionsHours
                 $output = $output->merge($slot_manager->output());
                 $next_start = $slot_manager->nextStart();
 
-                if ($slot_manager->shouldContinue()) {
-                    continue;
-                }
-
                 if ($slot_manager->shouldBreak()) {
                     break;
                 }

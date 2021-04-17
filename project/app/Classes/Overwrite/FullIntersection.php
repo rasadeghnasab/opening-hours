@@ -33,11 +33,6 @@ class FullIntersection implements IntersectionInterface
         $this->next_start = $next_start;
     }
 
-    public function shouldContinue(): bool
-    {
-        return true;
-    }
-
     public function shouldBreak(): bool
     {
         return false;

@@ -33,14 +33,9 @@ class RightIntersection implements IntersectionInterface
         $this->next_start = $next_start;
     }
 
-    public function shouldContinue(): bool
-    {
-        return $this->is_last_item;
-    }
-
     public function shouldBreak(): bool
     {
-        return true;
+        return !$this->is_last_item;
     }
 
     public function output(): array
