@@ -10,6 +10,7 @@ project: laravel-dep up test
 laravel-dep:
 	cp project/.env.example project/.env
 	$(COMPOSE) run --rm composer install
+	$(COMPOSE) run --rm artisan migrate:refresh --seed
 
 artisan:
 	$(COMPOSE) run --rm artisan $(c)
