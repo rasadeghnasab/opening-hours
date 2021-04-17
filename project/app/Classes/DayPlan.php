@@ -55,7 +55,14 @@ class DayPlan
             }
 
             if ($time_range['from'] >= $next_start) {
-                $output->push($time_range->only('from', 'to', 'day', 'status'));
+                $output->push(
+                    [
+                        'from' => $time_range['from'],
+                        'to' => $time_range['to'],
+                        'status' => $time_range['status'],
+                        'day' => $day,
+                    ]
+                );
                 $next_start = $time_range['to'];
             }
         }
@@ -72,71 +79,9 @@ class DayPlan
         }
 
         if ($output->isEmpty() && !$this->plan->isEmpty()) {
-            $output = $output->merge($this->plan);
+            $output = $output->merge($this->plan->toArray());
         }
 
         return $output;
-        $full_day_plan = collect();
-        $min = $this->plan->min('from');
-        $max = $this->plan->max('to');
-        $day = $this->date->dayOfWeek;
-        $next_start = $start_time;
-
-        if ($min > $start_time) {
-            $full_day_plan->push(
-                [
-                    'from' => $start_time,
-                    'to' => $min,
-                    'status' => 0,
-                    'day' => $day,
-                ]
-            );
-        }
-
-        foreach ($this->plan as $time_range) {
-            if ($next_start >= $end_time) {
-                break;
-            }
-
-            if ($time_range['from'] > $next_start) {
-                $full_day_plan->push(
-                    [
-                        'from' => $next_start,
-                        'to' => $time_range['from'],
-                        'status' => 0,
-                        'day' => $day,
-                    ]
-                );
-            }
-
-            if ($time_range['from'] >= $next_start) {
-                $full_day_plan->push(
-                    [
-                        'from' => $time_range['from'],
-                        'to' => $time_range['to'],
-                        'status' => $time_range['status'],
-                        'day' => $day,
-                    ]
-                );
-                $next_start = $time_range['to'];
-            }
-        }
-
-        if ($max < $end_time) {
-            $full_day_plan->push(
-                [
-                    'from' => $max ?? $start_time,
-                    'to' => $end_time,
-                    'status' => 0,
-                    'day' => $day,
-                ]
-            );
-        }
-
-        if ($full_day_plan->isEmpty() && !$this->plan->isEmpty()) {
-            $full_day_plan = $full_day_plan->merge($this->plan);
-        }
-
-        return $full_day_plan;
     }
 }
