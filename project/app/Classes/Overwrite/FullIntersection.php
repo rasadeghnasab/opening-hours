@@ -45,11 +45,24 @@ class FullIntersection implements IntersectionInterface
 
     public function output(): array
     {
-        return [];
+        return [
+            [
+                'from' => $this->intersection_range['from'],
+                'to' => $this->exception['from'],
+                'status' => $this->time_slot['status'],
+                'day' => $this->date->dayOfWeek,
+            ],
+            [
+                'from' => $this->exception['to'],
+                'to' => $this->intersection_range['to'],
+                'status' => $this->time_slot['status'],
+                'day' => $this->date->dayOfWeek,
+            ]
+        ];
     }
 
     public function nextStart(): string
     {
-        return $this->time_slot['to'];
+        return $this->intersection_range['to'];
     }
 }

@@ -5,7 +5,7 @@ namespace App\Classes\Overwrite;
 use App\Interfaces\IntersectionInterface;
 use Carbon\Carbon;
 
-class OverIntersection implements IntersectionInterface
+class InsideInteraction implements IntersectionInterface
 {
     private array $intersection_range;
     private array $exception;
@@ -45,31 +45,11 @@ class OverIntersection implements IntersectionInterface
 
     public function output(): array
     {
-        $output = [];
-        array_push(
-            $output,
-            [
-                'from' => $this->intersection_range['from'],
-                'to' => $this->exception['from'],
-                'status' => $this->time_slot['status'],
-                'day' => $this->date->dayOfWeek,
-            ]
-        );
-        array_push(
-            $output,
-            [
-                'from' => $this->exception['to'],
-                'to' => $this->intersection_range['to'],
-                'status' => $this->time_slot['status'],
-                'day' => $this->date->dayOfWeek,
-            ]
-        );
-
-        return $output;
+        return [];
     }
 
     public function nextStart(): string
     {
-        return $this->intersection_range['to'];
+        return $this->time_slot['to'];
     }
 }

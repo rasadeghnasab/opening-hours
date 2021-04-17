@@ -46,10 +46,12 @@ class LeftIntersection implements IntersectionInterface
     public function output(): array
     {
         return [
-            'from' => $this->intersection_range['from'],
-            'to' => $this->exception['from'],
-            'status' => $this->time_slot['status'],
-            'day' => $this->date->dayOfWeek,
+            [
+                'from' => $this->intersection_range['from'],
+                'to' => $this->exception['from'],
+                'status' => $this->time_slot['status'],
+                'day' => $this->date->dayOfWeek,
+            ]
         ];
     }
 

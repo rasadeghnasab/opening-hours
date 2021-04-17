@@ -45,12 +45,18 @@ class RightIntersection implements IntersectionInterface
 
     public function output(): array
     {
-        return [
-            'from' => $this->exception['to'],
-            'to' => $this->time_slot['to'],
-            'status' => $this->time_slot['status'],
-            'day' => $this->date->dayOfWeek,
-        ];
+        if ($this->is_last_item) {
+            return [
+                [
+                    'from' => $this->exception['to'],
+                    'to' => $this->time_slot['to'],
+                    'status' => $this->time_slot['status'],
+                    'day' => $this->date->dayOfWeek,
+                ]
+            ];
+        }
+
+        return [];
     }
 
     public function nextStart(): string

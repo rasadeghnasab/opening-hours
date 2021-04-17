@@ -45,11 +45,16 @@ class NoIntersection implements IntersectionInterface
 
     public function output(): array
     {
-        return $this->time_slot;
+        return $this->gapExists() ? [$this->time_slot] : [];
     }
 
     public function nextStart(): string
     {
-        return $this->next_start <= $this->time_slot['from'] ? $this->time_slot['to'] : $this->next_start;
+        return  $this->gapExists() ? $this->time_slot['to'] : $this->next_start;
+    }
+
+    private function gapExists(): bool
+    {
+       return $this->next_start <= $this->time_slot['from'];
     }
 }

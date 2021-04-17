@@ -116,90 +116,20 @@ class ExceptionsHours
 
                 $slot_manager = $intersection_manager->slot();
 
-                $output->merge($slot_manager->output());
+                $output = $output->merge($slot_manager->output());
                 $next_start = $slot_manager->nextStart();
 
-                if($slot_manager->shouldContinue()) {
+                if ($slot_manager->shouldContinue()) {
                     continue;
                 }
 
-                if($slot_manager->shouldBreak()) {
-                    break;
-                }
-
-                continue; // just comment out code below
-
-                // exception and time_range have intersect
-                $has_intersect =
-                    ($time_range['from'] < $exception_to) &&
-                    ($time_range['to'] > $exception_from);
-
-                if (!$has_intersect) {
-                    if ($next_start <= $time_range['from']) {
-                        $output->push($time_range);
-                        $next_start = $time_range['to'];
-                    }
-                    continue;
-                }
-
-                $from = $next_start < $exception_from ? $next_start : null;
-                $to = $time_range['to'] < $exception_to ? null : $time_range['to'];
-
-                if (is_null($from) && is_null($to)) {
-                    $next_start = $time_range['to'];
-                    continue;
-                }
-                elseif ($from && $to) {
-                    $output->push(
-                        [
-                            'from' => $from,
-                            'to' => $exception_from,
-                            'status' => $time_range['status'],
-                            'day' => $time_range['day'] ?? null,
-                        ]
-                    );
-                    $output->push(
-                        [
-                            'from' => $exception_to,
-                            'to' => $to,
-                            'status' => $time_range['status'],
-                            'day' => $time_range['day'] ?? null,
-                        ]
-                    );
-                    $next_start = $to;
-                    continue;
-                }
-                elseif ($from && is_null($to)) {
-                    $output->push(
-                        [
-                            'from' => $from,
-                            'to' => $exception_from,
-                            'status' => $time_range['status'],
-                            'day' => $time_range['day'] ?? null,
-                        ]
-                    );
-                    $next_start = $time_range['to'];
-                }
-                elseif (is_null($from) && $to) {
-                    $next_start = $exception_to;
-
-                    if ($is_last_item) {
-                        $output->push(
-                            [
-                                'from' => $exception_to,
-                                'to' => $time_range['to'],
-                                'status' => $time_range['status'],
-                                'day' => $time_range['day'] ?? null,
-                            ]
-                        );
-                        continue;
-                    }
+                if ($slot_manager->shouldBreak()) {
                     break;
                 }
             }
         }
 
-        return $output->merge(
+        $output = $output->merge(
             $exceptions->map(
                 function ($exception) {
                     $exception_from = $exception->from->toDateString() < $this->date->toDateString()
@@ -220,6 +150,8 @@ class ExceptionsHours
                 return $time_range['from'] !== $time_range['to'];
             }
         )->sortBy('from')->values();
+
+        return $output;
     }
 
     /**
