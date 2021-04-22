@@ -15,7 +15,8 @@ You have to have `docker` and `docker-composer` installed on your system in orde
     - `cd opening_hours`
     
 3. up and run the whole project
-    - `make project`
+    - `make project` 
+    - Note: You can use `sudo make project` if it gives you any permission error
 
 4. you can find the API documentation and usage example
     - https://documenter.getpostman.com/view/844555/TzJrDKyh
