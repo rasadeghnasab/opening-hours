@@ -22,11 +22,6 @@ You have to have `docker` and `docker-composer` installed on your system in orde
     - https://documenter.getpostman.com/view/844555/TzJrDKyh
 
 ---
-# A quick note for the reviewers
-
-- I wrote test functions name in a snake_case type to be more readable despite that breaks the PSR-12 rules.
-
----
 # Useful make commands
 
 Here we listed some useful commands that you can use to develop the application:
